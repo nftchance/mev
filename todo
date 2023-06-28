@@ -1,0 +1,12 @@
+Hooks:
+    ☐ useEventFilter({})
+        Notes: Return the events of a given event filter.
+    ☐ useTransactionFilter({})
+        Notes: Return the transactions of a given transaction filter.
+    ☐ useBlockNumber()
+    ☐ useERC721Oracle({
+        address: string,
+        tokenId: number,
+        exact: boolean
+    })
+        Notes: Used to get the price of an NFT in ETH.
