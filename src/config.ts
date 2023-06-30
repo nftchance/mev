@@ -1,12 +1,40 @@
-import { StrategyConfiguration } from './types'
+import { StrategyConfigurations } from './types'
 
-import { example } from './strategies'
+import {
+    useContract,
+    useContractTransaction,
+    useWallet,
+} from './hooks/generics'
 
-const config = {
+import { bottedMint, example } from './strategies'
+import { parseEther } from 'ethers'
+
+import wallets from './wallet.config'
+
+export default {
     example: {
         enabled: false,
         call: example,
     },
-} as StrategyConfiguration
-
-export default config
+    etherMint: {
+        enabled: true,
+        config: {
+            trigger: {
+                from: '0x',
+                to: useContract({ address: '0x', chainId: 1 }),
+                functionName: 'enableClaims',
+                status: 'pending',
+            },
+            action: useContractTransaction({
+                from: useWallet({
+                    wallet: wallets.nftchance,
+                    chainId: 1,
+                }),
+                contract: { address: '0x' },
+                functionName: 'mint',
+                value: parseEther('0.1'),
+            }),
+        },
+        call: bottedMint,
+    },
+} as StrategyConfigurations

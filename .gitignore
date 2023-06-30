@@ -2,6 +2,7 @@
 .DS_Store
 .eslintcache
 .env
+env.yaml
 .next
 .pnpm-debug.log*
 cache

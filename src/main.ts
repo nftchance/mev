@@ -1,17 +1,21 @@
-import config from "./config";
+import config from './config'
 
-import { onStrategySuccess } from "./callbacks";
+import { onError, onStrategySuccess } from './callbacks'
 
 const main = () => {
     Object.keys(config).forEach((strategyName) => {
-        const strategy = config[strategyName];
+        const strategy = config[strategyName]
 
-        if (!strategy.enabled) return;
+        if (!strategy.enabled) return
 
-        console.log(`Running ${strategyName}...`);
+        console.log(`Running ${strategyName}...`)
 
-        strategy.call({ onSuccess: onStrategySuccess });
-    });
+        strategy.call({
+            config: strategy.config || {},
+            onError,
+            onSuccess: onStrategySuccess,
+        })
+    })
 }
 
-main();
+main()
