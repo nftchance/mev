@@ -1,0 +1,1 @@
+export { bottedMint } from './bottedMint'

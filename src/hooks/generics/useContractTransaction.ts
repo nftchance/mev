@@ -1,32 +1,31 @@
-import { TransactionReceipt, Wallet } from 'ethers'
+import { TransactionReceipt } from 'ethers'
+
+import { ContractTransaction, Hook } from '../../types'
 
 import { useContract } from './useContract'
 
-type TuseContractTransaction = (props: {
-    // Base transaction configuration
-    from: Wallet
-    contract: { address: string }
-    functionName: string
-    functionArgs?: [string | bigint | number][]
-    value?: string | bigint | number
-    chainId?: number
-    // Utility configuration
-    silent?: boolean
-    retries?: number
-}) => {
-    call: (lifecycles?: number) => Promise<TransactionReceipt | null>
-}
+export const useContractTransaction: Hook<
+    ContractTransaction,
+    {
+        call: (props: {
+            lifecycles?: number
+        }) => Promise<TransactionReceipt | null>
+    }
+> = ({ enabled = true, config, onSuccess }) => {
+    const {
+        from,
+        contract: contractArgs,
+        functionName,
+        functionArgs = [],
+        value = 0,
+        silent = false,
+        retries = 0,
+    } = config
 
-export const useContractTransaction: TuseContractTransaction = ({
-    from,
-    contract: contractArgs,
-    functionName,
-    functionArgs = [],
-    value = 0,
-    silent = false,
-    retries = 0,
-}) => {
-    const call = async (lifecycles = 0) => {
+    const call = async ({ lifecycles = 0 }) => {
+        if (!enabled)
+            throw new Error('Hook is not enabled in @useContractTransaction.')
+
         const contract = await useContract({
             ...contractArgs,
             provider: from,
@@ -51,7 +50,13 @@ export const useContractTransaction: TuseContractTransaction = ({
 
         if (!receipt && !silent) throw new Error('Transaction failed.')
 
-        if (!receipt && retries - lifecycles > 0) await call(lifecycles + 1)
+        // @danger This is a recursive call and may be a loaded gun. Do not use
+        //         retries here unless you are certain that you are okay with
+        //         failed transaction fees.
+        if (!receipt && retries - lifecycles > 0)
+            await call({ lifecycles: lifecycles + 1 })
+
+        onSuccess?.(receipt)
 
         return receipt
     }

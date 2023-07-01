@@ -1,15 +1,11 @@
-import { Contract, TransactionReceipt, WebSocketProvider } from 'ethers'
+import { Contract, TransactionReceipt } from 'ethers'
 
-import { Hook } from '../../types'
-import { TransactionFilter } from '../../types/generics'
+import { Hook, TransactionFilter } from '../../types'
 
 const useTransactionFilter: Hook<
+    TransactionFilter,
     {
-        provider: WebSocketProvider
-        filter: TransactionFilter
-    },
-    {
-        transaction: TransactionReceipt
+        transactions: TransactionReceipt[]
     }
 > = ({ enabled, onSuccess, onError, config }) => {
     const transactions: TransactionReceipt[] = []

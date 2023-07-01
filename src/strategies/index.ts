@@ -1,4 +1,4 @@
-export { azukiClaimableElementals } from './azukiClaimableElementals'
+export { bottedMint } from './generics/bottedMint'
 
-export { bottedMint } from './bottedMint'
 export { example } from './example'
+export { etherMint } from './etherMint'
