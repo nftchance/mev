@@ -8,5 +8,6 @@ env.yaml
 cache
 coverage
 dist
+references
 node_modules
 tsconfig.tsbuildinfo

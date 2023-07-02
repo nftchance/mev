@@ -1,13 +1,14 @@
 {
-  "compilerOptions": {
-    "target": "es2021",
-    "module": "commonjs",
-    "outDir": "dist",
-    "rootDir": "src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true
-  },
-  "include": ["src"],
-  "exclude": ["node_modules/"]
-}
+    "compilerOptions": {
+      "target": "es2021",
+      "module": "commonjs",
+      "outDir": "dist",
+      "rootDir": "./",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true
+    },
+    "include": ["src/**/*", "main.ts"],
+    "exclude": ["node_modules/"]
+  }
+  
