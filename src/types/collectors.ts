@@ -9,8 +9,14 @@ export type Collector<T, P> = (props: P) => {
 }
 
 export type NewBlock = {
+    type: 'NewBlock'
     hash: string
     number: number
+}
+
+export type OpenseaOrder = {
+    type: 'OpenseaOrder'
+    listing: string
 }
 
 export type BlockCollectorProps = {

@@ -1,8 +1,12 @@
 import { AddressLike, WebSocketProvider } from 'ethers'
 
+import { NewBlock, OpenseaOrder } from '../types/collectors'
+
 const PAIR_FACTORY_DEPLOYMENT_BLOCK = 14650730
 const PAIR_FACTORY_ADDRESS = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
 const POOL_EVENT_SIGNATURES = []
+
+type Event = NewBlock | OpenseaOrder
 
 export const openseaSudoswapArb = ({
     client,
@@ -36,46 +40,50 @@ export const openseaSudoswapArb = ({
         }
     }
 
-    /// Core Event enum for the current strategy.
-    // #[derive(Debug, Clone)]
-    // pub enum Event {
-    //     NewBlock(NewBlock),
-    //     OpenseaOrder(Box<OpenseaOrder>),
-    // }
-
-    // /// Core Action enum for the current strategy.
-    // #[derive(Debug, Clone)]
-    // pub enum Action {
-    //     SubmitTx(SubmitTxToMempool),
-    // }
-
-    // convert the above rust to typescript
-
-    // type Event = NewBlock | OpenseaOrder
-
     const processEvent = async (event: Event) => {
-        // Determine if event is an OpenSea order or a new block
-        // Process the event accordingly
-        switch (typeof event) {
+        // Determine if event is an OpenSea order or a new block and process accordingly
+        switch (event.type) {
             case 'NewBlock':
+                await processNewBlockEvent(event)
+                    .then(() => {})
+                    .catch((err) => {
+                        throw new Error(err)
+                    })
+                break
+            case 'OpenseaOrder':
+                await processOrderEvent(event)
+                break
         }
     }
 
     // TODO: Implement the OpenSea collector and types
     // Process new OpenSea orders as they come in.
-    const processOrderEvent = async (event) => {
+    const processOrderEvent = async (event: OpenseaOrder) => {
         // Ignore orders that are not on Ethereum
+        event
         // Ignore orders with non-eth payment
         // Find the pool with the highest bid for the nft of this order
         // Ignore orders that are not profitable
         // Build the arb transaction
+        buildArbTransaction()
     }
 
     // Process new block events, updating the internal state
-    const processNewBlockEvent = async (event) => {
+    const processNewBlockEvent = async (event: NewBlock) => {
         // Find new pools that were created in the last block
+        const newPools = await getNewPools({
+            fromBlock: event.number,
+            toBlock: event.number,
+        })
         // Find new pools that were touched in the last block
+        const touchedPools = await getTouchedPools({
+            fromBlock: event.number,
+            toBlock: event.number,
+        })
+
         // Get quotes for all new and touched pools and update state
+        const quotes = await getQuotesForPools([...newPools, ...touchedPools])
+        updateInternalPoolState(quotes)
     }
 
     // Build arb transaction from order hash and pool params
@@ -117,5 +125,5 @@ export const openseaSudoswapArb = ({
         // If a quote is not available, remove from both the poolBids and sudoPools maps.
     }
 
-    return { syncState }
+    return { syncState, processEvent }
 }
