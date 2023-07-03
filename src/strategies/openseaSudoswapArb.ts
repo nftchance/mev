@@ -1,4 +1,6 @@
-import { AddressLike, WebSocketProvider } from 'ethers'
+import { ItemListedEventPayload } from '@opensea/stream-js'
+import { AddressLike, WebSocketProvider, ZeroAddress } from 'ethers'
+import { OpenSeaSDK } from 'opensea-js'
 
 import { NewBlock, OpenseaOrder } from '../types/collectors'
 
@@ -10,7 +12,8 @@ type Event = NewBlock | OpenseaOrder
 
 export const openseaSudoswapArb = ({
     client,
-}: { client: WebSocketProvider }) => {
+    openseaClient,
+}: { client: WebSocketProvider; openseaClient: OpenSeaSDK }) => {
     const pairFactory = undefined
     const stateOverride = undefined
     const address = undefined
@@ -19,8 +22,8 @@ export const openseaSudoswapArb = ({
 
     const bidPercentage = 0
 
-    const sudoPools = []
-    const poolBids = []
+    const sudoPools: { [key: string]: AddressLike[] } = {}
+    const poolBids = {}
 
     const syncState = async () => {
         // Block in which the pool factory was deployed.
@@ -41,12 +44,13 @@ export const openseaSudoswapArb = ({
     }
 
     const processEvent = async (event: Event) => {
-        // Determine if event is an OpenSea order or a new block and process accordingly
         switch (event.type) {
             case 'NewBlock':
                 await processNewBlockEvent(event)
                     .then(() => {})
                     .catch((err) => {
+                        // Error out here because it means the system is out of sync.
+                        // This is a critical failure and could result in the loss of funds.
                         throw new Error(err)
                     })
                 break
@@ -59,13 +63,32 @@ export const openseaSudoswapArb = ({
     // TODO: Implement the OpenSea collector and types
     // Process new OpenSea orders as they come in.
     const processOrderEvent = async (event: OpenseaOrder) => {
+        const nftAddress = event.listing.item.nft_id.split('/')[1]
+
         // Ignore orders that are not on Ethereum
-        event
+        if (event.listing.item.chain.name.toLowerCase() !== 'ethereum') return
+
         // Ignore orders with non-eth payment
+        if (event.listing.payment_token.address !== ZeroAddress) return
+
         // Find the pool with the highest bid for the nft of this order
+        const pools = sudoPools[nftAddress]
+
+        // let (max_pool, max_bid) = pools
+        //     .iter()
+        //     .filter_map(|pool| self.pool_bids.get(pool).map(|bid| (pool, bid)))
+        //     .max_by(|a, b| a.1.cmp(b.1))?;
+
+        // convert the above rust to typescript
+
+        const [max_pool, max_bid] = [ZeroAddress, 0]
+        pools
+
         // Ignore orders that are not profitable
+        if (max_bid <= parseInt(event.listing.base_price)) return
+
         // Build the arb transaction
-        buildArbTransaction()
+        await buildArbTransaction(event.listing, max_pool, max_bid)
     }
 
     // Process new block events, updating the internal state
@@ -87,17 +110,44 @@ export const openseaSudoswapArb = ({
     }
 
     // Build arb transaction from order hash and pool params
-    const buildArbTransaction = async () => {
-        // Get full order from OpenSea v2 API
+    const buildArbTransaction = async (
+        listing: ItemListedEventPayload,
+        sudoPool: AddressLike,
+        sudoBid: number,
+    ) => {
+        sudoPool
+
+        // TODO: implement the real addresses
+        const accountAddress = ZeroAddress
+        const protocolAddress = ZeroAddress
+
+        const order = await openseaClient.api.generateFulfillmentData(
+            accountAddress,
+            listing.order_hash,
+            protocolAddress,
+            'ask',
+        )
+
         // Parse out the arb contract parameters
+        const paymentValue = order.fulfillment_data.transaction.value
+        const totalProfit = paymentValue - sudoBid
+
         // Build the arb transaction
+        const tx = {
+            tx: undefined,
+            gasBidInfo: {
+                totalProfit,
+                bidPercentage,
+            },
+        }
+
+        // TODO: Finish here
+        tx
     }
 
     // Get quotes for a list of pools
     const getQuotesForPools: (pools: AddressLike[]) => Promise<void> =
-        async () => {
-            const quotes = []
-        }
+        async () => {}
     // Find all the pools that were touched in a given block range
     const getTouchedPools: (props: {
         fromBlock: number
