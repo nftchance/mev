@@ -115,13 +115,12 @@ export const openseaSudoswapArb = ({
         sudoPool: AddressLike,
         sudoBid: number,
     ) => {
-        sudoPool
-
         // TODO: implement the real addresses
         const accountAddress = ZeroAddress
         const protocolAddress = ZeroAddress
 
-        const order = await openseaClient.api.generateFulfillmentData(
+        // Generate the order fulfillment data
+        const listingData = await openseaClient.api.generateFulfillmentData(
             accountAddress,
             listing.order_hash,
             protocolAddress,
@@ -129,12 +128,14 @@ export const openseaSudoswapArb = ({
         )
 
         // Parse out the arb contract parameters
-        const paymentValue = order.fulfillment_data.transaction.value
+        const paymentValue = listingData.fulfillment_data.transaction.value
         const totalProfit = paymentValue - sudoBid
 
-        // Build the arb transaction
+        // Build the arb transactions
+        const order = undefined
+
         const tx = {
-            tx: undefined,
+            tx: [order, paymentValue, sudoPool],
             gasBidInfo: {
                 totalProfit,
                 bidPercentage,
