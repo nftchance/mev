@@ -1,29 +1,44 @@
 import { ItemListedEventPayload } from '@opensea/stream-js'
-import { AddressLike, WebSocketProvider, ZeroAddress } from 'ethers'
+import { AddressLike, Contract, WebSocketProvider, ZeroAddress } from 'ethers'
 import { OpenSeaSDK } from 'opensea-js'
 
+import { useMempoolTransaction } from '../hooks'
 import { NewBlock, OpenseaOrder } from '../types/collectors'
+import { MempoolTransaction } from '../types/executors'
 
 const PAIR_FACTORY_DEPLOYMENT_BLOCK = 14650730
 const PAIR_FACTORY_ADDRESS = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
-const POOL_EVENT_SIGNATURES = []
+const PAIR_FACTORY_ABI: any[] = []
+// const POOL_EVENT_SIGNATURES = []
+
+const ARB_ADDRESS = '0x000000'
+const ARB_ABI: any[] = [
+    'function swapOpenSeaToSudoswap(uint256 order, uint256 startAmount, address sudoPool) external',
+]
 
 type Event = NewBlock | OpenseaOrder
+type Action = MempoolTransaction
 
 export const openseaSudoswapArb = ({
     client,
     openseaClient,
 }: { client: WebSocketProvider; openseaClient: OpenSeaSDK }) => {
-    const pairFactory = undefined
-    const stateOverride = undefined
-    const address = undefined
-    const quoter = undefined
-    const arbContract = undefined
+    const pairFactory = new Contract(
+        PAIR_FACTORY_ADDRESS,
+        PAIR_FACTORY_ABI,
+        client,
+    )
+    const arbContract = new Contract(ARB_ADDRESS, ARB_ABI, client)
+    pairFactory
+
+    // const stateOverride = undefined
+    // const address = undefined
+    // const quoter = undefined
 
     const bidPercentage = 0
 
     const sudoPools: { [key: string]: AddressLike[] } = {}
-    const poolBids = {}
+    // const poolBids = {}
 
     const syncState = async () => {
         // Block in which the pool factory was deployed.
@@ -32,7 +47,6 @@ export const openseaSudoswapArb = ({
         const toBlock = await client.getBlockNumber()
 
         const poolAddresses = await getNewPools({ fromBlock, toBlock })
-
         const chunkSize = 200
 
         // Get current bids and update state for all pools in chunks of 200
@@ -60,20 +74,23 @@ export const openseaSudoswapArb = ({
         }
     }
 
-    // TODO: Implement the OpenSea collector and types
     // Process new OpenSea orders as they come in.
-    const processOrderEvent = async (event: OpenseaOrder) => {
-        const nftAddress = event.listing.item.nft_id.split('/')[1]
+    const processOrderEvent = async (
+        event: OpenseaOrder,
+    ): Promise<Action | undefined> => {
+        const [chainName, contractAddress] =
+            event.listing.item.nft_id.split('/')
 
         // Ignore orders that are not on Ethereum
-        if (event.listing.item.chain.name.toLowerCase() !== 'ethereum') return
+        if (chainName.toLowerCase() !== 'ethereum') return
 
         // Ignore orders with non-eth payment
         if (event.listing.payment_token.address !== ZeroAddress) return
 
         // Find the pool with the highest bid for the nft of this order
-        const pools = sudoPools[nftAddress]
+        const pools = sudoPools[contractAddress]
 
+        // TODO: Implement this section
         // let (max_pool, max_bid) = pools
         //     .iter()
         //     .filter_map(|pool| self.pool_bids.get(pool).map(|bid| (pool, bid)))
@@ -88,7 +105,7 @@ export const openseaSudoswapArb = ({
         if (max_bid <= parseInt(event.listing.base_price)) return
 
         // Build the arb transaction
-        await buildArbTransaction(event.listing, max_pool, max_bid)
+        return await buildArbTransaction(event.listing, max_pool, max_bid)
     }
 
     // Process new block events, updating the internal state
@@ -114,7 +131,7 @@ export const openseaSudoswapArb = ({
         listing: ItemListedEventPayload,
         sudoPool: AddressLike,
         sudoBid: number,
-    ) => {
+    ): Promise<Action | undefined> => {
         // TODO: implement the real addresses
         const accountAddress = ZeroAddress
         const protocolAddress = ZeroAddress
@@ -128,22 +145,38 @@ export const openseaSudoswapArb = ({
         )
 
         // Parse out the arb contract parameters
-        const paymentValue = listingData.fulfillment_data.transaction.value
-        const totalProfit = paymentValue - sudoBid
+        const startAmount = listingData.fulfillment_data.transaction.value
+        const totalProfit = startAmount - sudoBid
 
-        // Build the arb transactions
-        const order = undefined
+        // Convert the fulfillment data to an order struct that can be used onchain
+        const [_, tokenAddress, tokenId] = listing.item.nft_id.split('/')
+        const order = await openseaClient.createBuyOrder({
+            asset: {
+                tokenAddress,
+                tokenId,
+            },
+            accountAddress,
+            startAmount,
+            paymentTokenAddress: listing.payment_token.address,
+        })
 
-        const tx = {
-            tx: [order, paymentValue, sudoPool],
-            gasBidInfo: {
+        // Build the arb transaction using our custom contract
+        const transaction =
+            await arbContract.swapOpenSeaToSudoswap.populateTransaction(
+                order,
+                startAmount,
+                sudoPool,
+            )
+
+        // TODO: Finish here by returning the prepared transaction
+        return useMempoolTransaction({
+            client,
+            transaction,
+            gasInfo: {
                 totalProfit,
                 bidPercentage,
             },
-        }
-
-        // TODO: Finish here
-        tx
+        })
     }
 
     // Get quotes for a list of pools

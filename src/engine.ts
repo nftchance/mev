@@ -4,13 +4,7 @@ import { BlockCollector } from './types/collectors'
 
 // import { useBlockCollector } from './collectors/block'
 
-export type Engine = () => {
-    collectors: BlockCollector[]
-    addCollector: (collector: any) => void
-    run: () => Promise<void>
-}
-
-export const useEngine: Engine = () => {
+export const useEngine = () => {
     const collectors: BlockCollector[] = []
 
     const addCollector = (collector: any) => {
