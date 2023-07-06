@@ -1,10 +1,5 @@
 import { ContractTransaction, WebSocketProvider } from 'ethers'
 
-// Parameters of the executors as objects.
-export type MempoolExecutorParams = {
-    client: WebSocketProvider
-}
-
 // Actions that could be taken by executors.
 export type GasInfo = {
     // Total profit expected from an opportunity.
@@ -13,7 +8,9 @@ export type GasInfo = {
     bidPercentage?: number
 }
 
-export type SubmitTransaction = {
+export type SubmitTransaction = (params: {
+    client: WebSocketProvider
+}) => {
     transaction: ContractTransaction
     gasInfo?: GasInfo
 }

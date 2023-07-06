@@ -2,23 +2,21 @@ import { ItemListedEventPayload } from '@opensea/stream-js'
 import { WebSocketProvider } from 'ethers'
 
 // Parameters of the collectors as objects.
-export type BlockCollectorParams = {
-    // TODO: need to update this to be a signed provider
-    provider: WebSocketProvider
-}
-
-export type OpenseaOrderCollectorParams = {
-    apiKey: string
-}
+// export type BlockCollectorParams =
 
 // Events that could fire from collectors.
-export type NewBlock = {
+export type NewBlock = (params: {
+    // TODO: need to update this to be a signed provider
+    client: WebSocketProvider
+}) => {
     type: 'NewBlock'
     hash: string
     number: number
 }
 
-export type OpenseaOrder = {
+export type OpenseaOrder = (params: {
+    apiKey: string
+}) => {
     type: 'OpenseaOrder'
     listing: ItemListedEventPayload
 }

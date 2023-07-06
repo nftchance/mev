@@ -1,10 +1,12 @@
 import { ItemListedEventPayload } from '@opensea/stream-js'
-import { AddressLike, Contract, WebSocketProvider, ZeroAddress } from 'ethers'
-import { OpenSeaSDK } from 'opensea-js'
+import { AddressLike, Contract, ZeroAddress } from 'ethers'
+// import { OpenSeaSDK } from 'opensea-js'
 
 import { useMempoolTransaction } from '../hooks'
+import { Strategy } from '../types'
 import { NewBlock, OpenseaOrder } from '../types/collectors'
-import { MempoolTransaction } from '../types/executors'
+import { SubmitTransaction } from '../types/executors'
+// import { MempoolTransaction } from '../types/executors'
 
 const PAIR_FACTORY_DEPLOYMENT_BLOCK = 14650730
 const PAIR_FACTORY_ADDRESS = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
@@ -16,13 +18,13 @@ const ARB_ABI: any[] = [
     'function swapOpenSeaToSudoswap(uint256 order, uint256 startAmount, address sudoPool) external',
 ]
 
-type Event = NewBlock | OpenseaOrder
-type Action = MempoolTransaction
+type Event = OpenseaOrder | NewBlock
+type Action = SubmitTransaction
 
-export const openseaSudoswapArb = ({
-    client,
-    openseaClient,
-}: { client: WebSocketProvider; openseaClient: OpenSeaSDK }) => {
+export const openseaSudoswapArb: Strategy<Event, Action> = (params) => {
+    const { client, apiKey } = params
+    apiKey // unused reference fix
+
     const pairFactory = new Contract(
         PAIR_FACTORY_ADDRESS,
         PAIR_FACTORY_ABI,
@@ -57,26 +59,24 @@ export const openseaSudoswapArb = ({
         }
     }
 
-    const processEvent = async (event: Event) => {
+    const processEvent = async (event: ReturnType<Event>) => {
         switch (event.type) {
             case 'NewBlock':
-                await processNewBlockEvent(event)
+                return await processNewBlockEvent(event)
                     .then(() => {})
                     .catch((err) => {
                         // Error out here because it means the system is out of sync.
                         // This is a critical failure and could result in the loss of funds.
                         throw new Error(err)
                     })
-                break
             case 'OpenseaOrder':
-                await processOrderEvent(event)
-                break
+                return await processOrderEvent(event)
         }
     }
 
     // Process new OpenSea orders as they come in.
     const processOrderEvent = async (
-        event: OpenseaOrder,
+        event: ReturnType<OpenseaOrder>,
     ): Promise<Action | undefined> => {
         const [chainName, contractAddress] =
             event.listing.item.nft_id.split('/')
@@ -109,7 +109,7 @@ export const openseaSudoswapArb = ({
     }
 
     // Process new block events, updating the internal state
-    const processNewBlockEvent = async (event: NewBlock) => {
+    const processNewBlockEvent = async (event: ReturnType<NewBlock>) => {
         // Find new pools that were created in the last block
         const newPools = await getNewPools({
             fromBlock: event.number,
