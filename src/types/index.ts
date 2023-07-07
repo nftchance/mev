@@ -1,24 +1,6 @@
 import { Collector } from './collectors'
 import { Executor } from './executors'
 
-// export type NewBlock = (params: {
-//     // TODO: need to update this to be a signed provider
-//     client: WebSocketProvider
-// }) => {
-//     type: 'NewBlock'
-//     hash: string
-//     number: number
-// }
-
-// export type OpenseaOrder = (params: {
-//     apiKey: string
-// }) => {
-//     type: 'OpenseaOrder'
-//     listing: ItemListedEventPayload
-// }
-
-// type Event = NewBlock | OpenseaOrder
-
 type ExtractParams<TEvent extends (...args: any) => any> =
     Parameters<TEvent>[number]
 
@@ -39,9 +21,7 @@ export type Strategy<
         UnionToIntersection<ExtractParams<TAction>>,
 ) => {
     syncState: () => Promise<void>
-    processEvent: (
-        event: ReturnType<TEvent>,
-    ) => Promise<void | ReturnType<TAction>>
+    processEvent: (event: ReturnType<TEvent>) => Promise<TAction | void>
 }
 
 export type Engine = {
@@ -59,9 +39,3 @@ export type Engine = {
     // and coordinate the data between each.
     run: () => Promise<void>
 }
-
-// Strategy declarations.
-// export type OpenseaSudoswapArbitrageStrategy = Strategy<
-//     NewBlock | OpenseaOrder,
-//     SubmitTransaction
-// >

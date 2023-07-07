@@ -1,5 +1,6 @@
 import { ItemListedEventPayload } from '@opensea/stream-js'
 import { WebSocketProvider } from 'ethers'
+import { OpenSeaSDK } from 'opensea-js'
 
 // Parameters of the collectors as objects.
 // export type BlockCollectorParams =
@@ -15,7 +16,7 @@ export type NewBlock = (params: {
 }
 
 export type OpenseaOrder = (params: {
-    apiKey: string
+    openseaClient: OpenSeaSDK
 }) => {
     type: 'OpenseaOrder'
     listing: ItemListedEventPayload

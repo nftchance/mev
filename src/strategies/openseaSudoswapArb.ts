@@ -21,17 +21,18 @@ const ARB_ABI: any[] = [
 type Event = OpenseaOrder | NewBlock
 type Action = SubmitTransaction
 
-export const openseaSudoswapArb: Strategy<Event, Action> = (params) => {
-    const { client, apiKey } = params
-    apiKey // unused reference fix
-
+export const openseaSudoswapArb: Strategy<Event, Action> = ({
+    client,
+    openseaClient,
+}) => {
     const pairFactory = new Contract(
         PAIR_FACTORY_ADDRESS,
         PAIR_FACTORY_ABI,
         client,
     )
-    const arbContract = new Contract(ARB_ADDRESS, ARB_ABI, client)
     pairFactory
+
+    const arbContract = new Contract(ARB_ADDRESS, ARB_ABI, client)
 
     // const stateOverride = undefined
     // const address = undefined
@@ -44,7 +45,6 @@ export const openseaSudoswapArb: Strategy<Event, Action> = (params) => {
 
     const syncState = async () => {
         // Block in which the pool factory was deployed.
-
         const fromBlock = PAIR_FACTORY_DEPLOYMENT_BLOCK
         const toBlock = await client.getBlockNumber()
 
@@ -59,18 +59,28 @@ export const openseaSudoswapArb: Strategy<Event, Action> = (params) => {
         }
     }
 
-    const processEvent = async (event: ReturnType<Event>) => {
+    const processEvent = async (
+        event: ReturnType<Event>,
+    ): Promise<Action | void> => {
         switch (event.type) {
             case 'NewBlock':
-                return await processNewBlockEvent(event)
+                await processNewBlockEvent(event)
                     .then(() => {})
                     .catch((err) => {
                         // Error out here because it means the system is out of sync.
                         // This is a critical failure and could result in the loss of funds.
                         throw new Error(err)
                     })
-            case 'OpenseaOrder':
-                return await processOrderEvent(event)
+            case 'OpenseaOrder': {
+                const orderAction = await processOrderEvent(
+                    event as ReturnType<OpenseaOrder>,
+                )
+
+                // If there is a valid order, send off the signal to execute it.
+                if (orderAction) {
+                    return orderAction
+                }
+            }
         }
     }
 
