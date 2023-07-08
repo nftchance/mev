@@ -1,4 +1,4 @@
-import { ItemListedEventPayload } from '@opensea/stream-js'
+import { ItemListedEventPayload, OpenSeaStreamClient } from '@opensea/stream-js'
 import { WebSocketProvider } from 'ethers'
 import { OpenSeaSDK } from 'opensea-js'
 
@@ -20,7 +20,7 @@ export type NewBlock = (params: {
 }
 
 export type OpenseaOrder = (params: {
-    openseaClient: OpenSeaSDK
+    openseaClient: OpenSeaStreamClient
 }) => Event & {
     type: 'OpenseaOrder'
     listing: ItemListedEventPayload
@@ -32,14 +32,15 @@ export type CollectorStream<TEvent> = {
 
 // Create a collector that has a generic type of TEvent
 // and takes a generic type of TParams.
-export type Collector<TEvent = Event> = <TParams = {}>(
-    params: TParams,
-) => {
+export type Collector<
+    TEvent extends (...args: any[]) => any = () => {},
+    TParams = {},
+> = (params: Parameters<TEvent>[number]) => {
     // This is a promise that resolves to an async iterator
     // meaning that it can be used in a for await loop like:
     // for await (const event of collector.getEventStream()) {
     //     // do something with event
     // }
     // and it will yield events as they come in.
-    getEventStream: () => Promise<CollectorStream<TEvent>>
+    getEventStream: () => Promise<CollectorStream<ReturnType<TEvent>>>
 }
