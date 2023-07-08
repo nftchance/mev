@@ -1,0 +1,10 @@
+☐ Finish implementing the base of the engine
+
+Right now, things have reached a level of complexity that makes it hard to continue without having the ability to actually make sure the system is working. Before doing the below, we need the ability to actually interact with the engine that exists.
+
+☐ Get eth_call overrides functioning.
+    ☐ Implement getTouchedPools and getNewPools
+☐ Get the ABIs for the contracts that our MEV bot consumes implemented so that we are not just getting the code in the references.
+
+☐ Figure out what a generalized MEV bot contract looks like.
+☐ Figure out the pipeline deploying contracts.

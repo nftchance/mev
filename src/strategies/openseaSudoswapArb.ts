@@ -6,7 +6,6 @@ import { useMempoolTransaction } from '../hooks'
 import { Strategy } from '../types'
 import { NewBlock, OpenseaOrder } from '../types/collectors'
 import { SubmitTransaction } from '../types/executors'
-// import { MempoolTransaction } from '../types/executors'
 
 const PAIR_FACTORY_DEPLOYMENT_BLOCK = 14650730
 const PAIR_FACTORY_ADDRESS = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
@@ -15,15 +14,19 @@ const PAIR_FACTORY_ABI: any[] = []
 
 const ARB_ADDRESS = '0x000000'
 const ARB_ABI: any[] = [
-    'function swapOpenSeaToSudoswap(uint256 order, uint256 startAmount, address sudoPool) external',
+    'function swapOpenSeaToSudoswap(OrderV2 order, uint256 startAmount, address sudoPool) external',
 ]
 
 type Event = OpenseaOrder | NewBlock
 type Action = SubmitTransaction
+type Config = {
+    bidPercentage: number
+}
 
-export const openseaSudoswapArb: Strategy<Event, Action> = ({
+export const openseaSudoswapArb: Strategy<Event, Action, Config> = ({
     client,
     openseaClient,
+    bidPercentage = 0,
 }) => {
     const pairFactory = new Contract(
         PAIR_FACTORY_ADDRESS,
@@ -38,10 +41,11 @@ export const openseaSudoswapArb: Strategy<Event, Action> = ({
     // const address = undefined
     // const quoter = undefined
 
-    const bidPercentage = 0
-
-    const sudoPools: { [key: string]: AddressLike[] } = {}
-    // const poolBids = {}
+    /// Map NFT addresses to a list of Sudo pair addresses which trade that NFT.
+    const sudoPools = new Map<AddressLike, AddressLike[]>()
+    /// Map Sudo pool addresses to the current bid for that pool (in ETH).
+    const poolBids = new Map<AddressLike, bigint>()
+    poolBids
 
     const syncState = async () => {
         // Block in which the pool factory was deployed.
@@ -77,9 +81,9 @@ export const openseaSudoswapArb: Strategy<Event, Action> = ({
                 )
 
                 // If there is a valid order, send off the signal to execute it.
-                if (orderAction) {
-                    return orderAction
-                }
+                if (orderAction) return orderAction
+
+                // If an order fails, it is okay and we will just continue as no funds are at risk.
             }
         }
     }
@@ -98,15 +102,13 @@ export const openseaSudoswapArb: Strategy<Event, Action> = ({
         if (event.listing.payment_token.address !== ZeroAddress) return
 
         // Find the pool with the highest bid for the nft of this order
-        const pools = sudoPools[contractAddress]
+        const pools = sudoPools.get(contractAddress)
 
         // TODO: Implement this section
         // let (max_pool, max_bid) = pools
         //     .iter()
         //     .filter_map(|pool| self.pool_bids.get(pool).map(|bid| (pool, bid)))
         //     .max_by(|a, b| a.1.cmp(b.1))?;
-
-        // convert the above rust to typescript
 
         const [max_pool, max_bid] = [ZeroAddress, 0]
         pools
@@ -191,7 +193,10 @@ export const openseaSudoswapArb: Strategy<Event, Action> = ({
 
     // Get quotes for a list of pools
     const getQuotesForPools: (pools: AddressLike[]) => Promise<void> =
-        async () => {}
+        async () => {
+            return
+        }
+
     // Find all the pools that were touched in a given block range
     const getTouchedPools: (props: {
         fromBlock: number
@@ -202,6 +207,7 @@ export const openseaSudoswapArb: Strategy<Event, Action> = ({
 
         return []
     }
+
     // Find all the pools that were created in a given block range
     const getNewPools: (props: {
         fromBlock: number
