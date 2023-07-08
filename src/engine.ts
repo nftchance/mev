@@ -4,71 +4,112 @@ import { Engine, Strategy } from './types'
 import { Collector } from './types/collectors'
 import { Executor } from './types/executors'
 
-export const useEngine: Engine = () => {
-    const collectors: Collector[] = []
-    const executors: Executor[] = []
-    const strategies: Strategy[] = []
+const SOCKET = 'tcp://127.0.0.1:3000'
 
-    const addCollector = (collector: Collector) => {
+export const useEngine: Engine = () => {
+    const collectors: ReturnType<Collector>[] = []
+    const executors: ReturnType<Executor>[] = []
+    const strategies: ReturnType<Strategy>[] = []
+
+    const addCollector = (collector: ReturnType<Collector>) => {
         collectors.push(collector)
     }
 
-    const addExecutor = (executor: Executor) => {
+    const addExecutor = (executor: ReturnType<Executor>) => {
         executors.push(executor)
     }
 
-    const addStrategy = (strategy: Strategy) => {
+    const addStrategy = (strategy: ReturnType<Strategy>) => {
         strategies.push(strategy)
     }
 
-    const init = () => {
-        const event = zmq.socket('pub')
-        event.bindSync('tcp://127.0.0.1:3000')
+    const init = (): zmq.Socket[] => {
+        // Socket used to send messages to the executors.
+        const publisher = zmq.socket('pub')
+        publisher.bindSync(SOCKET)
 
-        const action = zmq.socket('pub')
-        action.bindSync('tcp://127.0.0.1:3000')
+        // Socket used to receive messages from the collectors.
+        const receiver = zmq.socket('sub')
+        receiver.connect(SOCKET)
 
-        return [event, action]
+        return [publisher, receiver]
     }
 
     /// The core run loop of the engine. This function will spawn a thread for
     /// each collector, strategy, and executor. It will then orchestrate the
     /// data flow between them.
     const run = async () => {
-        const [event, action] = init()
-
-        event
-        action
+        const [publisher, receiver] = init()
 
         // Start executors first so that we never collect data that
         // we don't have an executor for.
-        const executorsPromise = executors.map(async () => {
-            const receiver = action.subscribe('action')
+        const executorsPromise = executors.map(async (executor) => {
+            // Subscribe to the incoming actions.
+            receiver.subscribe('action')
 
-            receiver.on('message', (data) => {
-                data
-            })
+            try {
+                // Process actions as they arrive.
+                receiver.on('message', async (action) => {
+                    try {
+                        // Execute the action (catching the throw if it fails)
+                        await executor.execute(action)
+                    } catch (err) {
+                        console.error('Error executing action', err)
+                    }
+                })
+            } catch (err) {
+                console.error('Error receiving action', err)
+            }
         })
 
-        const strategiesPromises = strategies.map(async () => {
-            const receiver = event.subscribe('event')
-            const publisher = action
+        // Start strategies and enable the event stream.
+        const strategiesPromises = strategies.map(async (strategy) => {
+            // Subscribe to the incoming events emit from the collectors.
+            // This is used to manage internal state of strategies as well as to
+            // distribute events to the executors when the strategy emits.
+            receiver.subscribe('event')
 
-            receiver.on('message', (data) => {
-                data // prevent unused reference
+            // Initialize the cached state.
+            if (strategy.syncState) await strategy.syncState()
 
-                // process event
+            try {
+                // Process events as they arrive from the collectors.
+                receiver.on('message', async (event) => {
+                    const eventAction = await strategy.processEvent(event)
 
-                // send action to take
-                publisher.send(['action', 'data'])
-            })
+                    // If the strategy doesn't emit an action then we don't
+                    // need to do anything.
+                    if (eventAction === null) return
+
+                    try {
+                        // Send the action to the action socket.
+                        publisher.send(['action', 'data'])
+                    } catch (err) {
+                        console.error('Error sending action', err)
+                    }
+                })
+            } catch (err) {
+                console.error('Error receiving event', err)
+            }
         })
 
-        const collectorsPromises = collectors.map(async () => {
-            const publisher = event
+        // Start collectors last so that we don't start collecting
+        // data before we have a strategy for it.
+        const collectorsPromises = collectors.map(async (collector) => {
+            // Open a stream of events from the collector.
+            const eventStream = await collector.getEventStream()
 
-            // while next event
-            publisher.send(['event', 'data'])
+            // Iterate the event stream and publish the events
+            // to the event socket as they arrive. This will run for
+            // the lifetime of the collector.
+            for await (const event of eventStream) {
+                // Distribute the event to all of the strategies.
+                try {
+                    publisher.send(['event', event])
+                } catch (err) {
+                    console.error('Error sending event', err)
+                }
+            }
         })
 
         await Promise.all([

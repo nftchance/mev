@@ -15,7 +15,7 @@ export type SubmitTransaction = (params: {
     gasInfo?: GasInfo
 }
 
-export type Executor<TAction = {}> = <TParams>(
+export type Executor<TAction = undefined> = <TParams>(
     params: TParams,
 ) => {
     execute: (params: TAction) => Promise<void>

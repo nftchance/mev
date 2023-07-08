@@ -33,14 +33,14 @@ export type Strategy<
 
 export type Engine = () => {
     // Operational components driving the framework.
-    collectors: Collector[]
-    executors: Executor[]
-    strategies: Strategy[]
+    collectors: ReturnType<Collector>[]
+    executors: ReturnType<Executor>[]
+    strategies: ReturnType<Strategy>[]
 
     // Top level state management.
-    addCollector: (collector: Collector) => void
-    addExecutor: (executor: Executor) => void
-    addStrategy: (strategy: Strategy) => void
+    addCollector: (collector: ReturnType<Collector>) => void
+    addExecutor: (executor: ReturnType<Executor>) => void
+    addStrategy: (strategy: ReturnType<Strategy>) => void
 
     // Run all of the collectors, executors, and strategies
     // and coordinate the data between each.

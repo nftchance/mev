@@ -5,11 +5,15 @@ import { OpenSeaSDK } from 'opensea-js'
 // Parameters of the collectors as objects.
 // export type BlockCollectorParams =
 
+type Event = {
+    type: string
+}
+
 // Events that could fire from collectors.
 export type NewBlock = (params: {
     // TODO: need to update this to be a signed provider
     client: WebSocketProvider
-}) => {
+}) => Event & {
     type: 'NewBlock'
     hash: string
     number: number
@@ -17,7 +21,7 @@ export type NewBlock = (params: {
 
 export type OpenseaOrder = (params: {
     openseaClient: OpenSeaSDK
-}) => {
+}) => Event & {
     type: 'OpenseaOrder'
     listing: ItemListedEventPayload
 }
@@ -28,7 +32,7 @@ export type CollectorStream<TEvent> = {
 
 // Create a collector that has a generic type of TEvent
 // and takes a generic type of TParams.
-export type Collector<TEvent = {}> = <TParams = {}>(
+export type Collector<TEvent = Event> = <TParams = {}>(
     params: TParams,
 ) => {
     // This is a promise that resolves to an async iterator
