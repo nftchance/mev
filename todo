@@ -1,4 +1,4 @@
-☐ Finish implementing the base of the engine
+✔ Finish implementing the base of the engine @done(23-07-08 16:47)
 
 Right now, things have reached a level of complexity that makes it hard to continue without having the ability to actually make sure the system is working. Before doing the below, we need the ability to actually interact with the engine that exists.
 

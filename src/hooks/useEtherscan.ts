@@ -2,13 +2,13 @@ import axios from 'axios'
 
 import { AddressLike } from 'ethers'
 
-type TuseEtherscan = (props: { address: AddressLike }) => Promise<{
+type Etherscan = (props: { address: AddressLike }) => Promise<{
     abi: string
     name: string
     source: string
 }>
 
-export const useEtherscan: TuseEtherscan = async ({ address }) => {
+export const useEtherscan: Etherscan = async ({ address }) => {
     const etherscanApiKey = 'TZIQBTY59K1JUJUH22DKBUF9KDK65N57DN'
 
     const url = `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apiKey=${etherscanApiKey}`

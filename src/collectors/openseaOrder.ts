@@ -4,20 +4,25 @@ import { Collector, CollectorStream, OpenseaOrder } from '../types/collectors'
 
 import { useStream } from '../hooks'
 
-export const useOpenseaOrder: Collector<OpenseaOrder> = ({ openseaClient }) => {
+export const useOpenseaOrder: Collector<OpenseaOrder> = ({
+    openseaStreamClient,
+}) => {
     const { emitter, iterator } = useStream()
 
     const getEventStream = async (): Promise<
         CollectorStream<ReturnType<OpenseaOrder>>
     > => {
-        openseaClient.onItemListed('*', async (event: ItemListedEvent) => {
-            const order: ReturnType<OpenseaOrder> = {
-                type: 'OpenseaOrder',
-                listing: event.payload,
-            }
+        openseaStreamClient.onItemListed(
+            '*',
+            async (event: ItemListedEvent) => {
+                const order: ReturnType<OpenseaOrder> = {
+                    type: 'OpenseaOrder',
+                    listing: event.payload,
+                }
 
-            emitter.emit('NewOrder', order)
-        })
+                emitter.emit('OpenseaOrder', order)
+            },
+        )
 
         return iterator<ReturnType<OpenseaOrder>>('OpenseaOrder')
     }

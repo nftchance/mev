@@ -20,10 +20,10 @@ export const useBlockCollector: Collector<NewBlock> = ({ client }) => {
                 number: block.number,
             }
 
-            emitter.emit('newBlock', newBlock)
+            emitter.emit('NewBlock', newBlock)
         })
 
-        return iterator<ReturnType<NewBlock>>('newBlock')
+        return iterator<ReturnType<NewBlock>>('NewBlock')
     }
 
     return { getEventStream }

@@ -3,8 +3,6 @@ import { WebSocketProvider } from 'ethers'
 import { OpenSeaSDK } from 'opensea-js'
 
 // Parameters of the collectors as objects.
-// export type BlockCollectorParams =
-
 type Event = {
     type: string
 }
@@ -20,7 +18,8 @@ export type NewBlock = (params: {
 }
 
 export type OpenseaOrder = (params: {
-    openseaClient: OpenSeaStreamClient
+    openseaClient: OpenSeaSDK
+    openseaStreamClient: OpenSeaStreamClient
 }) => Event & {
     type: 'OpenseaOrder'
     listing: ItemListedEventPayload
@@ -35,7 +34,7 @@ export type CollectorStream<TEvent> = {
 export type Collector<
     TEvent extends (...args: any[]) => any = () => {},
     TParams = {},
-> = (params: Parameters<TEvent>[number]) => {
+> = (params: Parameters<TEvent>[number] & TParams) => {
     // This is a promise that resolves to an async iterator
     // meaning that it can be used in a for await loop like:
     // for await (const event of collector.getEventStream()) {
