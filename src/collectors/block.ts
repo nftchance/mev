@@ -11,15 +11,16 @@ export const useBlockCollector: Collector<NewBlock> = ({ client }) => {
         client.on('block', async (blockNumber: number) => {
             const block = await client.getBlock(blockNumber)
 
-            if (block?.hash) {
-                const newBlock: ReturnType<NewBlock> = {
-                    type: 'NewBlock',
-                    hash: block.hash,
-                    number: block.number,
-                }
+            // If we can't get the block, then we can't do anything with it.
+            if (!block?.hash) return
 
-                emitter.emit('newBlock', newBlock)
+            const newBlock: ReturnType<NewBlock> = {
+                type: 'NewBlock',
+                hash: block.hash,
+                number: block.number,
             }
+
+            emitter.emit('newBlock', newBlock)
         })
 
         return iterator<ReturnType<NewBlock>>('newBlock')
