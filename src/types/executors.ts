@@ -13,8 +13,9 @@ export type SubmitTransaction = (params: {
     }
 }
 
-export type Executor<TAction extends (...args: any) => any, TParams = {}> = (
-    params: Parameters<TAction>[number] & TParams,
-) => {
+export type Executor<
+    TAction extends (...args: any) => any = () => {},
+    TParams = {},
+> = (params: Parameters<TAction>[number] & TParams) => {
     execute: (args: ReturnType<TAction>) => Promise<void>
 }
