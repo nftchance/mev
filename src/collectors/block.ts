@@ -1,14 +1,11 @@
 import { Collector, NewBlock } from '../types/collectors'
 
-import { WebSocketProvider } from 'ethers'
 import { Socket } from 'zeromq'
 
-export const useBlockCollector: Collector<NewBlock> = ({
-    client,
-}: { client: WebSocketProvider }) => {
+export const useBlockCollector: Collector<NewBlock> = ({ client }) => {
     const getEventStream = async (publisher: Socket) => {
         // Tagged with `await` because we need to wait for the client to be ready.
-        await client.on('block', async (blockNumber) => {
+        await client.on('block', async (blockNumber: number) => {
             try {
                 // Get the details of the iterated block
                 const block = await client.getBlock(blockNumber)

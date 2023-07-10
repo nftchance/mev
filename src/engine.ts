@@ -45,6 +45,15 @@ export const useEngine: Engine = ({ publisher, receiver }) => {
             }
         })
 
+        executors
+        // ^?
+
+        strategies
+        // ^?
+
+        collectors
+        // ^?
+
         // Start strategies and enable the event stream.
         const strategiesPromises = strategies.map(async (strategy) => {
             // Subscribe to the incoming events emit from the collectors.
@@ -78,16 +87,14 @@ export const useEngine: Engine = ({ publisher, receiver }) => {
 
         // Start collectors last so that we don't start collecting
         // data before we have a strategy for it.
-        const collectorsPromises = collectors.map(
-            async (collector: typeof collectors[number]) => {
-                try {
-                    // The publisher interaction takes place within the collector.
-                    collector.getEventStream({ publisher })
-                } catch (err) {
-                    console.error('Error getting event stream', err)
-                }
-            },
-        )
+        const collectorsPromises = collectors.map(async (collector) => {
+            try {
+                // The publisher interaction takes place within the collector.
+                collector.getEventStream(publisher)
+            } catch (err) {
+                console.error('Error getting event stream', err)
+            }
+        })
 
         await Promise.all([
             ...collectorsPromises,
