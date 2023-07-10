@@ -1,12 +1,8 @@
-import zmq from 'zeromq'
-
 import { Engine, Strategy } from './types'
 import { Collector } from './types/collectors'
 import { Executor } from './types/executors'
 
-const SOCKET = 'tcp://127.0.0.1:3000'
-
-export const useEngine: Engine = () => {
+export const useEngine: Engine = ({ publisher, receiver }) => {
     const collectors: ReturnType<Collector>[] = []
     const executors: ReturnType<Executor>[] = []
     const strategies: ReturnType<Strategy>[] = []
@@ -23,28 +19,15 @@ export const useEngine: Engine = () => {
         strategies.push(strategy)
     }
 
-    const init = (): zmq.Socket[] => {
-        // Socket used to send messages to the executors.
-        const publisher = zmq.socket('pub')
-        publisher.bindSync(SOCKET)
-
-        // Socket used to receive messages from the collectors.
-        const receiver = zmq.socket('sub')
-        receiver.connect(SOCKET)
-
-        return [publisher, receiver]
-    }
-
     /// The core run loop of the engine. This function will spawn a thread for
     /// each collector, strategy, and executor. It will then orchestrate the
     /// data flow between them.
     const run = async () => {
-        const [publisher, receiver] = init()
-
         // Start executors first so that we never collect data that
         // we don't have an executor for.
         const executorsPromise = executors.map(async (executor) => {
             // Subscribe to the incoming actions.
+            // TODO: Need to make this use the key.
             receiver.subscribe('action')
 
             try {
@@ -96,7 +79,7 @@ export const useEngine: Engine = () => {
         // Start collectors last so that we don't start collecting
         // data before we have a strategy for it.
         const collectorsPromises = collectors.map(
-            async (collector: ReturnType<Collector>) => {
+            async (collector: typeof collectors[number]) => {
                 try {
                     // The publisher interaction takes place within the collector.
                     collector.getEventStream({ publisher })

@@ -1,5 +1,6 @@
 import { Collector } from './collectors'
 import { Executor } from './executors'
+import { Socket } from 'zeromq'
 
 // Iterate over the parameters of the event and action and
 // create a union of all of them.
@@ -31,7 +32,13 @@ export type Strategy<
     processEvent: (event: ReturnType<TEvent>) => Promise<TAction | void>
 }
 
-export type Engine = () => {
+export type Engine = ({
+    publisher,
+    receiver,
+}: {
+    publisher: Socket
+    receiver: Socket
+}) => {
     // Operational components driving the framework.
     collectors: ReturnType<Collector>[]
     executors: ReturnType<Executor>[]
