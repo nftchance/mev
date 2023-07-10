@@ -1,9 +1,10 @@
 import { Collector, NewBlock } from '../types/collectors'
-
-import { Socket } from 'zeromq'
+import { EventEmitter } from 'stream'
 
 export const useBlockCollector: Collector<NewBlock> = ({ client }) => {
-    const getEventStream = async (publisher: Socket) => {
+    const stream = new EventEmitter()
+
+    const getEventStream = async () => {
         // Tagged with `await` because we need to wait for the client to be ready.
         await client.on('block', async (blockNumber: number) => {
             try {
@@ -20,12 +21,15 @@ export const useBlockCollector: Collector<NewBlock> = ({ client }) => {
                 }
 
                 // Convert to string because zeromq only accepts strings.
-                publisher.send(['NewBlock', JSON.stringify(newBlock)])
+                const newBlockString = JSON.stringify(newBlock)
+
+                // Emit the new block event.
+                stream.emit('message', newBlockString)
             } catch (err) {
                 console.error('Error sending block', err)
             }
         })
     }
 
-    return { getEventStream }
+    return { stream, getEventStream }
 }

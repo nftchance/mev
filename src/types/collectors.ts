@@ -2,10 +2,11 @@ import { ExtractParams, UnionToIntersection } from './utils'
 import { ItemListedEventPayload, OpenSeaStreamClient } from '@opensea/stream-js'
 import { WebSocketProvider } from 'ethers'
 import { OpenSeaSDK } from 'opensea-js'
-import { Socket } from 'zeromq'
+
+import { EventEmitter } from 'events'
 
 // Parameters of the collectors as objects.
-type Event = {
+export type Event = {
     type: string
 }
 
@@ -35,5 +36,6 @@ export type Collector<
     // Inherit the parameters from the event and action.
     params: UnionToIntersection<ExtractParams<TEvent>> & TParams,
 ) => {
-    getEventStream: (publisher: Socket) => Promise<void>
+    stream: EventEmitter
+    getEventStream: () => Promise<void>
 }

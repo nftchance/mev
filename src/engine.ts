@@ -35,7 +35,7 @@ export const useEngine: Engine = ({ publisher, receiver }) => {
                 receiver.on('message', async (action) => {
                     try {
                         // Execute the action (catching the throw if it fails)
-                        await executor.execute(action)
+                        await executor.execute(JSON.parse(action))
                     } catch (err) {
                         console.error('Error executing action', err)
                     }
@@ -58,7 +58,9 @@ export const useEngine: Engine = ({ publisher, receiver }) => {
             try {
                 // Process events as they arrive from the collectors.
                 receiver.on('message', async (event) => {
-                    const eventAction = await strategy.processEvent(event)
+                    const parsedEvent: Event = JSON.parse(event)
+
+                    const eventAction = await strategy.processEvent(parsedEvent)
 
                     // If the strategy doesn't emit an action then we don't
                     // need to do anything.
@@ -66,7 +68,7 @@ export const useEngine: Engine = ({ publisher, receiver }) => {
 
                     try {
                         // Send the action to the action socket.
-                        publisher.send(['action', 'data'])
+                        publisher.send(['action', JSON.stringify(eventAction)])
                     } catch (err) {
                         console.error('Error sending action', err)
                     }
@@ -76,12 +78,21 @@ export const useEngine: Engine = ({ publisher, receiver }) => {
             }
         })
 
-        // Start collectors last so that we don't start collecting
-        // data before we have a strategy for it.
         const collectorsPromises = collectors.map(async (collector) => {
             try {
+                // Start collectors last so that we don't start collecting
+                // data before we have a strategy for it.
+                collector.stream.on('message', (event: Event) => {
+                    try {
+                        // Send the event to the event socket.
+                        publisher.send(['event', JSON.stringify(event)])
+                    } catch (err) {
+                        console.error('Error sending event', err)
+                    }
+                })
+
                 // The publisher interaction takes place within the collector.
-                collector.getEventStream(publisher)
+                await collector.getEventStream()
             } catch (err) {
                 console.error('Error getting event stream', err)
             }

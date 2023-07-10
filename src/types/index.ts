@@ -18,8 +18,8 @@ type UnionToIntersection<T> = (
     : never
 
 export type Strategy<
-    TEvent extends (...args: any) => any = () => {},
-    TAction extends (...args: any) => any = () => {},
+    TEvent extends (...args: any) => any = () => void,
+    TAction extends (...args: any) => any = () => void,
     TParams = {},
 > = (
     // Inherit the parameters from the event and action.
