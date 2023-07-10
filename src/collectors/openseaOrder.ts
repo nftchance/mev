@@ -1,25 +1,23 @@
-import { ItemListedEvent } from '@opensea/stream-js'
-
 import { Collector, OpenseaOrder } from '../types/collectors'
+
+import { ItemListedEvent } from '@opensea/stream-js'
+import { Socket } from 'zeromq'
 
 export const useOpenseaOrder: Collector<OpenseaOrder> = ({
     openseaStreamClient,
 }) => {
-    async function* getEventStream(): AsyncGenerator<ReturnType<OpenseaOrder>> {
-        while (true) {
-            const event = await new Promise<ItemListedEvent>((resolve) => {
-                openseaStreamClient.onItemListed(
-                    '*',
-                    (event: ItemListedEvent) => resolve(event),
-                )
+    const getEventStream = async (publisher: Socket) => {
+        try {
+            openseaStreamClient.onItemListed('*', (event: ItemListedEvent) => {
+                const order: ReturnType<OpenseaOrder> = {
+                    type: 'OpenseaOrder',
+                    listing: event.payload,
+                }
+
+                publisher.send(['OpenseaOrder', JSON.stringify(order)])
             })
-
-            const order: ReturnType<OpenseaOrder> = {
-                type: 'OpenseaOrder',
-                listing: event.payload,
-            }
-
-            yield order
+        } catch (err) {
+            console.error('Error sending order', err)
         }
     }
 
