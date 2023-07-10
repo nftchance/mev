@@ -1,11 +1,11 @@
-import { ItemListedEventPayload } from '@opensea/stream-js'
-import { AddressLike, Contract, ZeroAddress } from 'ethers'
-// import { OpenSeaSDK } from 'opensea-js'
-
-import { useMempoolTransaction } from '../hooks'
 import { Strategy } from '../types'
 import { NewBlock, OpenseaOrder } from '../types/collectors'
 import { SubmitTransaction } from '../types/executors'
+
+import { ItemListedEventPayload } from '@opensea/stream-js'
+import { AddressLike, Contract, ContractTransaction, ZeroAddress } from 'ethers'
+
+// import { useMempoolTransaction } from '../executors/useMempoolTransaction'
 
 const PAIR_FACTORY_DEPLOYMENT_BLOCK = 14650730
 const PAIR_FACTORY_ADDRESS = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
@@ -173,22 +173,39 @@ export const openseaSudoswapArb: Strategy<Event, Action, Config> = ({
         })
 
         // Build the arb transaction using our custom contract
-        const transaction =
+        const contractTransaction: ContractTransaction =
             await arbContract.swapOpenSeaToSudoswap.populateTransaction(
                 order,
                 startAmount,
                 sudoPool,
             )
 
-        // TODO: Finish here by returning the prepared transaction
-        return useMempoolTransaction({
-            client,
-            transaction,
+        const mempoolSubmission = {
+            transaction: {
+                to: contractTransaction.to,
+                data: contractTransaction.data,
+            },
             gasInfo: {
                 totalProfit,
                 bidPercentage,
             },
-        })
+        }
+
+        mempoolSubmission
+
+        return
+
+        // mempoolSubmission
+
+        // TODO: Finish here by returning the prepared transaction
+        // return useMempoolTransaction({
+        //     client,
+        //     transaction,
+        //     gasInfo: {
+        //         totalProfit,
+        //         bidPercentage,
+        //     },
+        // })
     }
 
     // Get quotes for a list of pools

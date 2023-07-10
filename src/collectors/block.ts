@@ -1,18 +1,24 @@
-import { Collector, CollectorStream, NewBlock } from '../types/collectors'
+import { NewBlock } from '../types/collectors'
+// import { NewBlock } from '../types/collectors'
+import { WebSocketProvider } from 'ethers'
 
-import { useStream } from '../hooks'
+// I want to create an async iterator that yields NewBlock events.
+export const useBlockCollector = ({
+    client,
+}: { client: WebSocketProvider }) => {
+    async function* getEventStream(): AsyncGenerator<ReturnType<NewBlock>> {
+        while (true) {
+            // Wait for the next block event. When it returns, this resolves but
+            // the while loop keeps running brining us back to the top of the loop.
+            const blockNumber = await new Promise<number>((resolve) => {
+                client.once('block', (blockNumber) => resolve(blockNumber))
+            })
 
-export const useBlockCollector: Collector<NewBlock> = ({ client }) => {
-    const { emitter, iterator } = useStream()
-
-    const getEventStream = async (): Promise<
-        CollectorStream<ReturnType<NewBlock>>
-    > => {
-        client.on('block', async (blockNumber: number) => {
+            // Get the details of the iterated block
             const block = await client.getBlock(blockNumber)
 
             // If we can't get the block, then we can't do anything with it.
-            if (!block?.hash) return
+            if (!block?.hash) continue
 
             const newBlock: ReturnType<NewBlock> = {
                 type: 'NewBlock',
@@ -20,10 +26,8 @@ export const useBlockCollector: Collector<NewBlock> = ({ client }) => {
                 number: block.number,
             }
 
-            emitter.emit('NewBlock', newBlock)
-        })
-
-        return iterator<ReturnType<NewBlock>>('NewBlock')
+            yield newBlock
+        }
     }
 
     return { getEventStream }

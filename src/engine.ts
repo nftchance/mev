@@ -95,22 +95,23 @@ export const useEngine: Engine = () => {
 
         // Start collectors last so that we don't start collecting
         // data before we have a strategy for it.
-        const collectorsPromises = collectors.map(async (collector) => {
-            // Open a stream of events from the collector.
-            const eventStream = await collector.getEventStream()
+        const collectorsPromises = collectors.map(
+            async (collector: ReturnType<Collector>) => {
+                collector.getEventStream()
 
-            // Iterate the event stream and publish the events
-            // to the event socket as they arrive. This will run for
-            // the lifetime of the collector.
-            for await (const event of eventStream) {
-                // Distribute the event to all of the strategies.
-                try {
-                    publisher.send(['event', event])
-                } catch (err) {
-                    console.error('Error sending event', err)
-                }
-            }
-        })
+                // Iterate the event stream and publish the events
+                // to the event socket as they arrive. This will run for
+                // the lifetime of the collector.
+                // for await (const event of getEventStream(publisher)) {
+                //     // Distribute the event to all of the strategies.
+                //     try {
+                //         publisher.send(['event', event])
+                //     } catch (err) {
+                //         console.error('Error sending event', err)
+                //     }
+                // }
+            },
+        )
 
         await Promise.all([
             ...collectorsPromises,

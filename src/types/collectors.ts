@@ -1,6 +1,7 @@
 import { ItemListedEventPayload, OpenSeaStreamClient } from '@opensea/stream-js'
 import { WebSocketProvider } from 'ethers'
 import { OpenSeaSDK } from 'opensea-js'
+import { Socket } from 'zeromq'
 
 // Parameters of the collectors as objects.
 type Event = {
@@ -41,5 +42,7 @@ export type Collector<
     //     // do something with event
     // }
     // and it will yield events as they come in.
-    getEventStream: () => Promise<CollectorStream<ReturnType<TEvent>>>
+    getEventStream: (args: {
+        publisher: Socket
+    }) => AsyncGenerator<ReturnType<TEvent>>
 }

@@ -31,7 +31,7 @@ export const useMempoolTransaction: Executor<SubmitTransaction> = ({
         // TODO: Gas "could" be zero if the block doesn't get mined.
         transaction.gasPrice = bidGasPrice
 
-        // Send the transaction.
+        // TODO: Send the transaction.
         // await client.send
     }
 
