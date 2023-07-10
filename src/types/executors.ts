@@ -1,3 +1,4 @@
+import { ExtractParams, UnionToIntersection } from './utils'
 import { ContractTransaction, WebSocketProvider } from 'ethers'
 
 // Actions that could be taken by executors.
@@ -16,6 +17,6 @@ export type SubmitTransaction = (params: {
 export type Executor<
     TAction extends (...args: any) => any = () => {},
     TParams = {},
-> = (params: Parameters<TAction>[number] & TParams) => {
+> = (params: UnionToIntersection<ExtractParams<TAction>> & TParams) => {
     execute: (args: ReturnType<TAction>) => Promise<void>
 }

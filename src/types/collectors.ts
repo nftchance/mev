@@ -1,20 +1,8 @@
+import { ExtractParams, UnionToIntersection } from './utils'
 import { ItemListedEventPayload, OpenSeaStreamClient } from '@opensea/stream-js'
 import { WebSocketProvider } from 'ethers'
 import { OpenSeaSDK } from 'opensea-js'
 import { Socket } from 'zeromq'
-
-// Iterate over the parameters of the event and action and
-// create a union of all of them.
-type ExtractParams<TEvent extends (...args: any) => any> =
-    Parameters<TEvent>[number]
-
-type UnionToIntersection<T> = (
-    T extends any
-        ? (args: T) => any
-        : never
-) extends (args: infer U) => any
-    ? U
-    : never
 
 // Parameters of the collectors as objects.
 type Event = {

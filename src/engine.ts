@@ -45,15 +45,6 @@ export const useEngine: Engine = ({ publisher, receiver }) => {
             }
         })
 
-        executors
-        // ^?
-
-        strategies
-        // ^?
-
-        collectors
-        // ^?
-
         // Start strategies and enable the event stream.
         const strategiesPromises = strategies.map(async (strategy) => {
             // Subscribe to the incoming events emit from the collectors.

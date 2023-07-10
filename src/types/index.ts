@@ -1,5 +1,6 @@
 import { Collector } from './collectors'
 import { Executor } from './executors'
+
 import { Socket } from 'zeromq'
 
 // Iterate over the parameters of the event and action and
