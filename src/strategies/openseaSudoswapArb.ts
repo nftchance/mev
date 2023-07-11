@@ -1,18 +1,16 @@
 import { Strategy } from '../types'
 import { NewBlock, OpenseaOrder } from '../types/collectors'
 import { SubmitTransaction } from '../types/executors'
+import { AddressLike } from '../types/utils'
 
 import { ItemListedEventPayload } from '@opensea/stream-js'
-import { AddressLike, Contract, ContractTransaction, ZeroAddress } from 'ethers'
-
-// import { useMempoolTransaction } from '../executors/useMempoolTransaction'
+import { Contract, ContractTransaction, ethers } from 'ethers'
 
 const PAIR_FACTORY_DEPLOYMENT_BLOCK = 14650730
 const PAIR_FACTORY_ADDRESS = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
 const PAIR_FACTORY_ABI: any[] = []
 // const POOL_EVENT_SIGNATURES = []
 
-const ARB_ADDRESS = '0x000000'
 const ARB_ABI: any[] = [
     'function swapOpenSeaToSudoswap(OrderV2 order, uint256 startAmount, address sudoPool) external',
 ]
@@ -20,22 +18,23 @@ const ARB_ABI: any[] = [
 type Event = OpenseaOrder | NewBlock
 type Action = SubmitTransaction
 type Config = {
+    arbContractAddress: AddressLike
     bidPercentage: number
 }
 
 export const openseaSudoswapArb: Strategy<Event, Action, Config> = ({
     client,
     openseaClient,
-    bidPercentage = 0,
+    arbContractAddress,
+    bidPercentage,
 }) => {
     const pairFactory = new Contract(
         PAIR_FACTORY_ADDRESS,
         PAIR_FACTORY_ABI,
         client,
     )
-    pairFactory
 
-    const arbContract = new Contract(ARB_ADDRESS, ARB_ABI, client)
+    const arbContract = new Contract(arbContractAddress, ARB_ABI, client)
 
     // const stateOverride = undefined
     // const address = undefined
@@ -45,7 +44,6 @@ export const openseaSudoswapArb: Strategy<Event, Action, Config> = ({
     const sudoPools = new Map<AddressLike, AddressLike[]>()
     /// Map Sudo pool addresses to the current bid for that pool (in ETH).
     const poolBids = new Map<AddressLike, bigint>()
-    poolBids
 
     const syncState = async () => {
         // Block in which the pool factory was deployed.
@@ -99,24 +97,29 @@ export const openseaSudoswapArb: Strategy<Event, Action, Config> = ({
         if (chainName.toLowerCase() !== 'ethereum') return
 
         // Ignore orders with non-eth payment
-        if (event.listing.payment_token.address !== ZeroAddress) return
+        if (
+            event.listing.payment_token.address !== ethers.constants.AddressZero
+        )
+            return
 
         // Find the pool with the highest bid for the nft of this order
-        const pools = sudoPools.get(contractAddress)
+        const pools = sudoPools.get(contractAddress as AddressLike)
 
         // TODO: Implement this section
+        pools
         // let (max_pool, max_bid) = pools
         //     .iter()
         //     .filter_map(|pool| self.pool_bids.get(pool).map(|bid| (pool, bid)))
         //     .max_by(|a, b| a.1.cmp(b.1))?;
 
-        const [max_pool, max_bid] = [ZeroAddress, 0]
-        pools
+        const [max_pool, max_bid]: [AddressLike, number] = [
+            ethers.constants.AddressZero,
+            0,
+        ]
 
         // Ignore orders that are not profitable
         if (max_bid <= parseInt(event.listing.base_price)) return
 
-        // Build the arb transaction
         return await buildArbTransaction(event.listing, max_pool, max_bid)
     }
 
@@ -145,8 +148,8 @@ export const openseaSudoswapArb: Strategy<Event, Action, Config> = ({
         sudoBid: number,
     ): Promise<Action | undefined> => {
         // TODO: implement the real addresses
-        const accountAddress = ZeroAddress
-        const protocolAddress = ZeroAddress
+        const accountAddress = ethers.constants.AddressZero
+        const protocolAddress = ethers.constants.AddressZero
 
         // Generate the order fulfillment data
         const listingData = await openseaClient.api.generateFulfillmentData(
@@ -219,6 +222,8 @@ export const openseaSudoswapArb: Strategy<Event, Action, Config> = ({
         fromBlock: number
         toBlock: number
     }) => Promise<AddressLike[]> = async ({ fromBlock, toBlock }) => {
+        pairFactory
+
         fromBlock
         toBlock
 
@@ -230,6 +235,8 @@ export const openseaSudoswapArb: Strategy<Event, Action, Config> = ({
         fromBlock: number
         toBlock: number
     }) => Promise<AddressLike[]> = async ({ fromBlock, toBlock }) => {
+        pairFactory
+
         fromBlock
         toBlock
 
@@ -239,6 +246,8 @@ export const openseaSudoswapArb: Strategy<Event, Action, Config> = ({
     // Update the internal state of the strategy with new pool addresses and quotes.
     const updateInternalPoolState: (poolsAndQuotes: any) => void = () => {
         // If a quote is available, update both the poolBids and sudoPools maps.
+        poolBids
+
         // If a quote is not available, remove from both the poolBids and sudoPools maps.
     }
 

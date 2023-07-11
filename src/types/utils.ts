@@ -1,3 +1,5 @@
+export type AddressLike = `0x${string}`
+
 export type ExtractParams<TEvent extends (...args: any) => any> =
     Parameters<TEvent>[number]
 
