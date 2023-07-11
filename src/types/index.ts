@@ -18,22 +18,27 @@ type UnionToIntersection<T> = (
     : never
 
 export type Strategy<
-    TEvent extends (...args: any) => any = () => void,
-    TAction extends (...args: any) => any = () => void,
+    TEvents extends (...args: any) => any,
+    TActions extends (...args: any) => any,
     TParams = {},
 > = (
     // Inherit the parameters from the event and action.
-    params: UnionToIntersection<ExtractParams<TEvent>> &
-        UnionToIntersection<ExtractParams<TAction>> &
+    params: UnionToIntersection<ExtractParams<TEvents>> &
+        UnionToIntersection<ExtractParams<TActions>> &
         TParams,
 ) => {
     // Initialize the strategy and save the state.
     syncState: () => Promise<void>
     // Process new strategy events when a collector yields them.
-    processEvent: (event: ReturnType<TEvent>) => Promise<TAction | void>
+    processEvent: (
+        event: ReturnType<TEvents>,
+    ) => Promise<ReturnType<TActions> | void>
 }
 
-export type Engine = ({
+export type Engine<
+    TEvents extends (...args: any) => any,
+    TActions extends (...args: any) => any,
+> = ({
     publisher,
     receiver,
 }: {
@@ -41,14 +46,14 @@ export type Engine = ({
     receiver: Socket
 }) => {
     // Operational components driving the framework.
-    collectors: ReturnType<Collector>[]
-    executors: ReturnType<Executor>[]
-    strategies: ReturnType<Strategy>[]
+    collectors: ReturnType<Collector<TEvents>>[]
+    executors: ReturnType<Executor<TActions>>[]
+    strategies: ReturnType<Strategy<TEvents, TActions>>[]
 
     // Top level state management.
-    addCollector: (collector: ReturnType<Collector>) => void
-    addExecutor: (executor: ReturnType<Executor>) => void
-    addStrategy: (strategy: ReturnType<Strategy>) => void
+    addCollector: (collector: ReturnType<Collector<TEvents>>) => void
+    addExecutor: (executor: ReturnType<Executor<TActions>>) => void
+    addStrategy: (strategy: ReturnType<Strategy<TEvents, TActions>>) => void
 
     // Run all of the collectors, executors, and strategies
     // and coordinate the data between each.

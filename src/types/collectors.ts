@@ -37,5 +37,5 @@ export type Collector<
     params: UnionToIntersection<ExtractParams<TEvent>> & TParams,
 ) => {
     stream: EventEmitter
-    getEventStream: () => Promise<void>
+    getEventStream: () => Promise<ReturnType<TEvent>>
 }

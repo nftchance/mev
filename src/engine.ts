@@ -1,21 +1,24 @@
 import { Engine, Strategy } from './types'
-import { Collector } from './types/collectors'
-import { Executor } from './types/executors'
+import { Collector, NewBlock, OpenseaOrder } from './types/collectors'
+import { Executor, SubmitTransaction } from './types/executors'
 
-export const useEngine: Engine = ({ publisher, receiver }) => {
-    const collectors: ReturnType<Collector>[] = []
-    const executors: ReturnType<Executor>[] = []
-    const strategies: ReturnType<Strategy>[] = []
+type Events = NewBlock | OpenseaOrder
+type Actions = SubmitTransaction
 
-    const addCollector = (collector: ReturnType<Collector>) => {
+export const useEngine: Engine<Events, Actions> = ({ publisher, receiver }) => {
+    const collectors: ReturnType<Collector<Events>>[] = []
+    const executors: ReturnType<Executor<Actions>>[] = []
+    const strategies: ReturnType<Strategy<Events, Actions>>[] = []
+
+    const addCollector = (collector: typeof collectors[number]) => {
         collectors.push(collector)
     }
 
-    const addExecutor = (executor: ReturnType<Executor>) => {
+    const addExecutor = (executor: typeof executors[number]) => {
         executors.push(executor)
     }
 
-    const addStrategy = (strategy: ReturnType<Strategy>) => {
+    const addStrategy = (strategy: typeof strategies[number]) => {
         strategies.push(strategy)
     }
 
@@ -58,7 +61,7 @@ export const useEngine: Engine = ({ publisher, receiver }) => {
             try {
                 // Process events as they arrive from the collectors.
                 receiver.on('message', async (event) => {
-                    const parsedEvent: Event = JSON.parse(event)
+                    const parsedEvent = JSON.parse(event)
 
                     const eventAction = await strategy.processEvent(parsedEvent)
 
