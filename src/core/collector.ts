@@ -1,31 +1,33 @@
 import { EventEmitter } from "stream";
 
-import { logger, Logger } from '../lib/logger'
-import errors from '../lib/errors'
+import errors from "../lib/errors";
+import { Logger, logger } from "../lib/logger";
 
-type Errors = typeof errors.Collector
+type Errors = typeof errors.Collector;
 
-export class Collector<TKey extends keyof Errors, TCollection> { 
+export abstract class Collector<TKey extends keyof Errors, TCollection> {
     constructor(
         public readonly key: TKey,
         public readonly errors: Errors[TKey],
         public readonly logger: Logger = logger,
-    ) { }
+    ) {}
 
-    emit(stream: EventEmitter, collection: TCollection) { 
+    emit(stream: EventEmitter, collection: TCollection) {
         try {
-            stream.emit('Collection', [this.key, collection])
+            stream.emit("Collection", [this.key, collection]);
 
-            logger.success(this.errors.SuccessPublishing(collection))
-         } catch (err) {
-            logger.error(this.errors.FailedPublishing(err))
+            logger.success(this.errors.SuccessPublishing(collection));
+        } catch (err) {
+            logger.error(this.errors.FailedPublishing(err));
         }
     }
 
     // ! This function is in this class, but the implementation
     //   happens in the child class. This is a design pattern called
     //   the Template Method Pattern.
-    getEventStream(stream: EventEmitter) { 
-        throw new Error(`Collector [${this.key}]: getEventStream() not implemented.`)
+    getEventStream(stream: EventEmitter) {
+        throw new Error(
+            `Collector [${this.key}]: getEventStream() not implemented.`,
+        );
     }
 }
