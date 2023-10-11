@@ -7,18 +7,18 @@ export const useOpenseaOrder: Collector<OpenseaOrder> = ({
     openseaStreamClient,
 }) => {
     const getEventStream = async (publisher: Socket) => {
-        try {
-            openseaStreamClient.onItemListed('*', (event: ItemListedEvent) => {
+        openseaStreamClient.onItemListed('*', (event: ItemListedEvent) => {
+            try {
                 const order: ReturnType<OpenseaOrder> = {
                     type: 'OpenseaOrder',
                     listing: event.payload,
                 }
 
                 publisher.send(['OpenseaOrder', JSON.stringify(order)])
-            })
-        } catch (err) {
-            console.error('Error sending order', err)
-        }
+            } catch (err) {
+                console.error('Error sending order', err)
+            }
+        })
     }
 
     return { getEventStream }

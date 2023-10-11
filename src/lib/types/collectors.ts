@@ -4,6 +4,7 @@ import { providers } from 'ethers'
 import { OpenSeaSDK } from 'opensea-js'
 
 import { EventEmitter } from 'events'
+import { Socket } from 'zeromq'
 
 // Parameters of the collectors as objects.
 export type Event = {
@@ -36,6 +37,6 @@ export type Collector<
     // Inherit the parameters from the event and action.
     params: UnionToIntersection<ExtractParams<TEvent>> & TParams,
 ) => {
-    stream: EventEmitter
-    getEventStream: () => Promise<ReturnType<TEvent>>
+    getEventStream: (publisher: Socket) => void
+    // getEventStream: () => Promise<ReturnType<TEvent>> | void
 }
