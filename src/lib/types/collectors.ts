@@ -1,9 +1,6 @@
 import { ExtractParams, UnionToIntersection } from './utils'
-import { ItemListedEventPayload, OpenSeaStreamClient } from '@opensea/stream-js'
 import { providers } from 'ethers'
-import { OpenSeaSDK } from 'opensea-js'
 
-import { EventEmitter } from 'events'
 import { Socket } from 'zeromq'
 
 // Parameters of the collectors as objects.
@@ -11,22 +8,9 @@ export type Event = {
     type: string
 }
 
-// Events that could fire from collectors.
-export type NewBlock = (params: {
-    client: providers.WebSocketProvider
-}) => Event & {
-    type: 'NewBlock'
-    hash: string
-    number: number
-}
 
-export type OpenseaOrder = (params: {
-    openseaClient: OpenSeaSDK
-    openseaStreamClient: OpenSeaStreamClient
-}) => Event & {
-    type: 'OpenseaOrder'
-    listing: ItemListedEventPayload
-}
+
+
 
 // Create a collector that has a generic type of TEvent
 // and takes a generic type of TParams.

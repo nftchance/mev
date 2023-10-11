@@ -1,3 +1,5 @@
-export const onError = (error: any) => console.error(error)
+import logger from '../lib/logger'
 
-export const onStrategySuccess = (response: any) => console.log(response)
+export const onError = (error: any) => logger.error(error)
+
+export const onStrategySuccess = (response: any) => logger.success(response)
