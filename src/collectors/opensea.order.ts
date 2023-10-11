@@ -6,8 +6,10 @@ import { Collector } from '../lib/types/collectors'
 import logger from '../lib/logger'
 import errors from '../lib/errors'
 
+const key = 'OpenseaOrder' as const
+
 export type OpenseaOrder = {
-    type: 'OpenseaOrder'
+    type: typeof key
     listing: ItemListedEventPayload
 }
 
@@ -21,9 +23,8 @@ export type OpenseaOrderCollector = (params: OpenseaOrderCollectorProps) => Open
 export const useOpenseaOrder: Collector<OpenseaOrderCollector> = ({
     openseaStreamClient,
 }) => {
-    const key = 'OpenseaOrder'
 
-    const getEventStream = async (publisher: EventEmitter) => {
+    const getEventStream = async (stream: EventEmitter) => {
         openseaStreamClient.onItemListed('*', (event: ItemListedEvent) => {
             try {
                 const order = {
@@ -31,7 +32,7 @@ export const useOpenseaOrder: Collector<OpenseaOrderCollector> = ({
                     listing: event.payload,
                 }
 
-                publisher.emit('Collection', [key, order])
+                stream.emit('Collection', [key, order])
 
                 logger.success(errors.Collector.OpenseaOrder.SuccessPublishingOrder(order))
             } catch (err) {

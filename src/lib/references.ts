@@ -70,7 +70,6 @@ Object.entries(config.protocols).forEach(async ([key, value]) => {
     const { abi, name, source } = await useEtherscan({ address: value })
 
     generateStaticReferences({ key, name, abi })
-
     generateDynamicReferences({ name, source })
 
     references[key] = {

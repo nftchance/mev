@@ -1,10 +1,11 @@
-import { useEngine } from './engine'
 import { OpenSeaStreamClient } from '@opensea/stream-js'
 import { Wallet } from 'ethers'
 import { ethers } from 'ethers'
 import { Chain, OpenSeaSDK } from 'opensea-js'
 
 import yaml from 'js-yaml'
+
+import { useEngine } from './engine'
 
 const env = yaml.load(
     require('fs').readFileSync('./env.yaml', 'utf8'),

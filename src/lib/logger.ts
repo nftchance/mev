@@ -8,7 +8,7 @@ enum LogLevel {
     ERROR,
 }
 
-class Logger {
+export class Logger {
     private logLevel: LogLevel;
 
     constructor(logLevel: LogLevel = LogLevel.INFO) {

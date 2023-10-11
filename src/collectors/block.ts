@@ -5,8 +5,10 @@ import { Collector } from '../lib/types/collectors'
 import logger from '../lib/logger'
 import error from '../lib/errors'
 
+const key = 'NewBlock' as const 
+
 export type NewBlock = {
-    type: 'NewBlock'
+    type: typeof key
     hash: string
     number: number
 }
@@ -17,10 +19,9 @@ export type NewBlockCollectorProps = {
 
 export type NewBlockCollector = (params: NewBlockCollectorProps) => NewBlock
 
-export const useBlockCollector: Collector<NewBlockCollector> = ({ client }) => {
-    const key = 'NewBlock' 
 
-    const getEventStream = async (publisher: EventEmitter) => {
+export const useBlockCollector: Collector<NewBlockCollector> = ({ client }) => {
+    const getEventStream = async (stream: EventEmitter) => {
         client.on('block', async (blockNumber: number) => {
             try {
                 const block = await client.getBlock(blockNumber)
@@ -32,12 +33,12 @@ export const useBlockCollector: Collector<NewBlockCollector> = ({ client }) => {
                 }
 
                 const newBlock = {
-                    type: 'NewBlock',
+                    type: key,
                     hash: block.hash,
                     number: block.number,
                 }
 
-                publisher.emit('Collection', [key, newBlock])
+                stream.emit('Collection', [key, newBlock])
 
                 logger.success(error.Collector.NewBlock.SuccessPublishingBlock(newBlock))
             } catch (err) {

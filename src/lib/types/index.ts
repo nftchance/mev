@@ -26,7 +26,7 @@ export type Strategy<
         TParams,
 ) => {
     // Initialize the strategy and save the state.
-    syncState: () => Promise<void>
+    syncState?: () => Promise<void>
     // Process new strategy events when a collector yields them.
     processEvent: (
         event: ReturnType<TEvents>,

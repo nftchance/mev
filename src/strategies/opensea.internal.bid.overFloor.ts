@@ -1,6 +1,6 @@
 import { Strategy } from '../lib/types'
 import { NewBlock, OpenseaOrder } from '../lib/types/collectors'
-import { SubmitTransaction } from '../lib/types/executors'
+import { MempoolTransaction } from '../executors/mempool'
 import { AddressLike } from '../lib/types/utils'
 
 import { ItemListedEventPayload } from '@opensea/stream-js'
@@ -11,27 +11,20 @@ const ARB_ABI: any[] = [
 ]
 
 type Event = OpenseaOrder | NewBlock
-type Action = SubmitTransaction
+type Action = MempoolTransaction
+
 type Config = {
     arbContractAddress: AddressLike
     bidPercentage: number
 }
 
-export const openseaSudoswapArb: Strategy<Event, Action, Config> = ({
+export const openseaInternalBidOverFloor: Strategy<Event, Action, Config> = ({
     client,
     openseaClient,
     arbContractAddress,
     bidPercentage,
 }) => {
     const arbContract = new Contract(arbContractAddress, ARB_ABI, client)
-
-    // const stateOverride = undefined
-    // const address = undefined
-    // const quoter = undefined
-
-    const syncState = async () => {
-        // ! Nothing to sync in this strategy as we do not backfill. 
-    }
 
     const processEvent = async (
         event: ReturnType<Event>,
@@ -66,27 +59,12 @@ export const openseaSudoswapArb: Strategy<Event, Action, Config> = ({
         )
             return
 
-        // let (max_pool, max_bid) = pools
-        //     .iter()
-        //     .filter_map(|pool| self.pool_bids.get(pool).map(|bid| (pool, bid)))
-        //     .max_by(|a, b| a.1.cmp(b.1))?;
-
-        const [max_pool, max_bid]: [AddressLike, number] = [
-            ethers.constants.AddressZero,
-            0,
-        ]
-
-        // Ignore orders that are not profitable
-        if (max_bid <= parseInt(event.listing.base_price)) return
-
-        return await buildArbTransaction(event.listing, max_pool, max_bid)
+        return await buildArbTransaction(event.listing)
     }
 
     // Build arb transaction from order hash and pool params
     const buildArbTransaction = async (
-        listing: ItemListedEventPayload,
-        sudoPool: AddressLike,
-        sudoBid: number,
+        listing: ItemListedEventPayload
     ): Promise<Action | undefined> => {
         // TODO: implement the real addresses
         const accountAddress = ethers.constants.AddressZero
@@ -100,46 +78,46 @@ export const openseaSudoswapArb: Strategy<Event, Action, Config> = ({
             'ask',
         )
 
-        // Parse out the arb contract parameters
-        const startAmount = listingData.fulfillment_data.transaction.value
-        const totalProfit = startAmount - sudoBid
+        listingData
 
-        // Convert the fulfillment data to an order struct that can be used onchain
-        const [_, tokenAddress, tokenId] = listing.item.nft_id.split('/')
-        const order = await openseaClient.createBuyOrder({
-            asset: {
-                tokenAddress,
-                tokenId,
-            },
-            accountAddress,
-            startAmount,
-            paymentTokenAddress: listing.payment_token.address,
-        })
+        // // Parse out the arb contract parameters
+        // const startAmount = listingData.fulfillment_data.transaction.value
+        // // const totalProfit = startAmount - sudoBid
 
-        // Build the arb transaction using our custom contract
-        const contractTransaction: ContractTransaction =
-            await arbContract.swapOpenSeaToSudoswap.populateTransaction(
-                order,
-                startAmount,
-                sudoPool,
-            )
+        // // Convert the fulfillment data to an order struct that can be used onchain
+        // const [_, tokenAddress, tokenId] = listing.item.nft_id.split('/')
+        // const order = await openseaClient.createBuyOrder({
+        //     asset: {
+        //         tokenAddress,
+        //         tokenId,
+        //     },
+        //     accountAddress,
+        //     startAmount,
+        //     paymentTokenAddress: listing.payment_token.address,
+        // })
 
-        const mempoolSubmission = {
-            transaction: {
-                to: contractTransaction.to,
-                data: contractTransaction.data,
-            },
-            gasInfo: {
-                totalProfit,
-                bidPercentage,
-            },
-        }
+        // // Build the arb transaction using our custom contract
+        // const contractTransaction: ContractTransaction =
+        //     await arbContract.swapOpenSeaToSudoswap.populateTransaction(
+        //         order,
+        //         startAmount,
+        //         sudoPool,
+        //     )
 
-        mempoolSubmission
-
-        return
+        // const mempoolSubmission = {
+        //     transaction: {
+        //         to: contractTransaction.to,
+        //         data: contractTransaction.data,
+        //     },
+        //     gasInfo: {
+        //         totalProfit,
+        //         bidPercentage,
+        //     },
+        // }
 
         // mempoolSubmission
+
+        return
 
         // TODO: Finish here by returning the prepared transaction
         // return useMempoolTransaction({
@@ -152,5 +130,5 @@ export const openseaSudoswapArb: Strategy<Event, Action, Config> = ({
         // })
     }
 
-    return { syncState, processEvent }
+    return { processEvent }
 }
