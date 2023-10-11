@@ -1,6 +1,6 @@
-import { Engine, Strategy } from './types'
-import { Collector, NewBlock, OpenseaOrder } from './types/collectors'
-import { Executor, SubmitTransaction } from './types/executors'
+import { Engine, Strategy } from '../lib/types'
+import { Collector, NewBlock, OpenseaOrder } from '../lib/types/collectors'
+import { Executor, SubmitTransaction } from '../lib/types/executors'
 
 type Events = NewBlock | OpenseaOrder
 type Actions = SubmitTransaction

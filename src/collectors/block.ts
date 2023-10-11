@@ -1,4 +1,4 @@
-import { Collector, NewBlock } from '../types/collectors'
+import { Collector, NewBlock } from '../lib/types/collectors'
 import { EventEmitter } from 'stream'
 
 export const useBlockCollector: Collector<NewBlock> = ({ client }) => {

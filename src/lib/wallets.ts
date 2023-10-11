@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
 
-import { WalletConfiguration } from '../types'
+import { WalletConfiguration } from './types'
 import { AddressLike } from 'ethers'
 
 const config = yaml.load(fs.readFileSync('env.yaml', 'utf-8')) as {

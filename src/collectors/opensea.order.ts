@@ -1,4 +1,4 @@
-import { Collector, OpenseaOrder } from '../types/collectors'
+import { Collector, OpenseaOrder } from '../lib/types/collectors'
 
 import { ItemListedEvent } from '@opensea/stream-js'
 import { Socket } from 'zeromq'

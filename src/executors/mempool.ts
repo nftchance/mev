@@ -1,4 +1,4 @@
-import { Executor, SubmitTransaction } from '../types/executors'
+import { Executor, SubmitTransaction } from '../lib/types/executors'
 
 export const useMempoolTransaction: Executor<SubmitTransaction> = ({
     client,
