@@ -1,51 +1,36 @@
 import { providers } from 'ethers'
 import { EventEmitter } from 'stream'
 
-import { Collector } from '../lib/types/collectors'
-import logger from '../lib/logger'
-import error from '../lib/errors'
+import { Collector } from '../core/collector'
 
-const key = 'NewBlock' as const 
+import errors from '../lib/errors'
 
-export type NewBlock = {
-    type: typeof key
+const key = 'NewBlock' as const
+
+export class BlockCollector extends Collector<typeof key, {
     hash: string
     number: number
-}
+}> { 
+    constructor(
+        public readonly client: providers.WebSocketProvider,
+    ) { super(key, errors.Collector.NewBlock) }
 
-export type NewBlockCollectorProps = {
-    client: providers.WebSocketProvider
-}
+    getEventStream = async (stream: EventEmitter) => {
+        this.client.on('block', async (blockNumber: number) => {
+            const block = await this.client.getBlock(blockNumber)
 
-export type NewBlockCollector = (params: NewBlockCollectorProps) => NewBlock
+            if (!block?.hash) {
+                this.logger.warn(
+                    this.errors.FailedRetrievingHash(blockNumber)
+                )
 
-
-export const useBlockCollector: Collector<NewBlockCollector> = ({ client }) => {
-    const getEventStream = async (stream: EventEmitter) => {
-        client.on('block', async (blockNumber: number) => {
-            try {
-                const block = await client.getBlock(blockNumber)
-
-                if (!block?.hash) {
-                    logger.warn(error.Collector.NewBlock.FailedRetrievingHash(blockNumber))
-
-                    return
-                }
-
-                const newBlock = {
-                    type: key,
-                    hash: block.hash,
-                    number: block.number,
-                }
-
-                stream.emit('Collection', [key, newBlock])
-
-                logger.success(error.Collector.NewBlock.SuccessPublishingBlock(newBlock))
-            } catch (err) {
-                logger.error(error.Collector.NewBlock.FailedPublishingBlock(err))
+                return
             }
+
+            this.emit(stream, {
+                hash: block.hash,
+                number: block.number,
+            })
         })
     }
-
-    return { key, getEventStream }
 }
