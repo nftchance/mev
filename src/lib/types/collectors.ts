@@ -1,6 +1,6 @@
 import { ExtractParams, UnionToIntersection } from './utils'
 import { ItemListedEventPayload, OpenSeaStreamClient } from '@opensea/stream-js'
-import { WebSocketProvider } from 'ethers'
+import { providers } from 'ethers'
 import { OpenSeaSDK } from 'opensea-js'
 
 import { EventEmitter } from 'events'
@@ -12,7 +12,7 @@ export type Event = {
 
 // Events that could fire from collectors.
 export type NewBlock = (params: {
-    client: WebSocketProvider
+    client: providers.WebSocketProvider
 }) => Event & {
     type: 'NewBlock'
     hash: string

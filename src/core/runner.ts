@@ -33,6 +33,7 @@ export const runner = async () => {
     const openseaStreamClient = new OpenSeaStreamClient({
         token: env.opensea.default,
     })
+
     const openseaSDK = new OpenSeaSDK(provider, {
         chain: Chain.Mainnet,
         apiKey: env.opensea.default,
@@ -57,7 +58,9 @@ export const runner = async () => {
         receiver,
     })
 
-    engine
+    console.log("✔︎ Generated engine.")
+
+    // engine
 
     // Setup block collector
     // Setup opensea order collector

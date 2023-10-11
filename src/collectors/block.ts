@@ -6,7 +6,7 @@ export const useBlockCollector: Collector<NewBlock> = ({ client }) => {
 
     const getEventStream = async () => {
         // Tagged with `await` because we need to wait for the client to be ready.
-        await client.on('block', async (blockNumber: number) => {
+        client.on('block', async (blockNumber: number) => {
             try {
                 // Get the details of the iterated block
                 const block = await client.getBlock(blockNumber)
