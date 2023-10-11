@@ -1,5 +1,5 @@
 import { providers } from 'ethers'
-import { Socket } from 'zeromq'
+import { EventEmitter } from 'stream'
 
 import { Collector } from '../lib/types/collectors'
 import logger from '../lib/logger'
@@ -18,7 +18,9 @@ export type NewBlockCollectorProps = {
 export type NewBlockCollector = (params: NewBlockCollectorProps) => NewBlock
 
 export const useBlockCollector: Collector<NewBlockCollector> = ({ client }) => {
-    const getEventStream = async (publisher: Socket) => {
+    const key = 'NewBlock' 
+
+    const getEventStream = async (publisher: EventEmitter) => {
         client.on('block', async (blockNumber: number) => {
             try {
                 const block = await client.getBlock(blockNumber)
@@ -35,7 +37,7 @@ export const useBlockCollector: Collector<NewBlockCollector> = ({ client }) => {
                     number: block.number,
                 }
 
-                publisher.send(['NewBlock', JSON.stringify(newBlock)])
+                publisher.emit('Collection', [key, newBlock])
 
                 logger.success(error.Collector.NewBlock.SuccessPublishingBlock(newBlock))
             } catch (err) {
@@ -44,5 +46,5 @@ export const useBlockCollector: Collector<NewBlockCollector> = ({ client }) => {
         })
     }
 
-    return { getEventStream }
+    return { key, getEventStream }
 }

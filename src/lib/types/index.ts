@@ -1,8 +1,6 @@
 import { Collector } from './collectors'
 import { Executor } from './executors'
 
-import { Socket } from 'zeromq'
-
 // Iterate over the parameters of the event and action and
 // create a union of all of them.
 type ExtractParams<TEvent extends (...args: any) => any> =
@@ -38,22 +36,11 @@ export type Strategy<
 export type Engine<
     TEvents extends (...args: any) => any,
     TActions extends (...args: any) => any,
-> = ({
-    publisher,
-    receiver,
-}: {
-    publisher: Socket
-    receiver: Socket
-}) => {
+> = () => {
     // Operational components driving the framework.
     collectors: ReturnType<Collector<TEvents>>[]
     executors: ReturnType<Executor<TActions>>[]
     strategies: ReturnType<Strategy<TEvents, TActions>>[]
-
-    // Top level state management.
-    addCollector: (collector: ReturnType<Collector<TEvents>>) => void
-    addExecutor: (executor: ReturnType<Executor<TActions>>) => void
-    addStrategy: (strategy: ReturnType<Strategy<TEvents, TActions>>) => void
 
     // Run all of the collectors, executors, and strategies
     // and coordinate the data between each.

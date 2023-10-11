@@ -1,6 +1,6 @@
 import { ItemListedEvent, ItemListedEventPayload, OpenSeaStreamClient } from '@opensea/stream-js'
 import { OpenSeaSDK } from 'opensea-js'
-import { Socket } from 'zeromq'
+import { EventEmitter } from 'stream'
 
 import { Collector } from '../lib/types/collectors'
 import logger from '../lib/logger'
@@ -12,7 +12,7 @@ export type OpenseaOrder = {
 }
 
 export type OpenseaOrderCollectorProps = {
-    openseaClient: OpenSeaSDK
+    openseaClient: OpenSeaSDK // ! This client is used a layer up to build and sign orders.
     openseaStreamClient: OpenSeaStreamClient
 }
 
@@ -21,15 +21,17 @@ export type OpenseaOrderCollector = (params: OpenseaOrderCollectorProps) => Open
 export const useOpenseaOrder: Collector<OpenseaOrderCollector> = ({
     openseaStreamClient,
 }) => {
-    const getEventStream = async (publisher: Socket) => {
+    const key = 'OpenseaOrder'
+
+    const getEventStream = async (publisher: EventEmitter) => {
         openseaStreamClient.onItemListed('*', (event: ItemListedEvent) => {
             try {
                 const order = {
-                    type: 'OpenseaOrder',
+                    type: key,
                     listing: event.payload,
                 }
 
-                publisher.send(['OpenseaOrder', JSON.stringify(order)])
+                publisher.emit('Collection', [key, order])
 
                 logger.success(errors.Collector.OpenseaOrder.SuccessPublishingOrder(order))
             } catch (err) {
@@ -38,5 +40,5 @@ export const useOpenseaOrder: Collector<OpenseaOrderCollector> = ({
         })
     }
 
-    return { getEventStream }
+    return { key, getEventStream }
 }

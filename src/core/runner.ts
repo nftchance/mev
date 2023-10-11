@@ -5,7 +5,6 @@ import { ethers } from 'ethers'
 import { Chain, OpenSeaSDK } from 'opensea-js'
 
 import yaml from 'js-yaml'
-import zmq from 'zeromq'
 
 const env = yaml.load(
     require('fs').readFileSync('./env.yaml', 'utf8'),
@@ -44,21 +43,14 @@ export const runner = async () => {
     openseaStreamClient
     openseaSDK
 
-    // Setup sockets used to transmit data.
-    const publisher = zmq.socket('pub')
-    const receiver = zmq.socket('sub')
-
-    const socketURL = 'tcp://localhost:3000'
-    publisher.bindSync(socketURL)
-    receiver.bindSync(socketURL)
-
     // Initialize the engine.
-    const engine = useEngine({
-        publisher,
-        receiver,
-    })
+    const engine = useEngine()
 
     console.log("✔︎ Generated engine.")
+
+    await engine.run()
+
+    console.log("✔︎ Ran engine.")
 
     // engine
 
