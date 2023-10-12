@@ -2,7 +2,7 @@ import fs from 'fs'
 import * as yaml from 'js-yaml'
 
 import { useEtherscan } from './hooks/useEtherscan'
-import { AddressLike } from './types/utils'
+import { AddressLike } from './types'
     
 const config = yaml.load(fs.readFileSync('env.yaml', 'utf-8')) as {
     [key: string]: {
