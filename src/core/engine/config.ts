@@ -1,6 +1,11 @@
+import dotenv from 'dotenv'
 import { ethers } from 'ethers'
 
 import { logger } from '@/lib/logger'
+
+// * Load dotenv config here so that when a user imports the library
+//   they automatically have access to process.env based on their .env.
+dotenv.config()
 
 // * Resource to acquire public RPC node URLs to use as default:
 //   - https://chainlist.org/
