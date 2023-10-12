@@ -1,12 +1,9 @@
 import { basename } from 'pathe'
 import pc from 'picocolors'
 
+import { defineConfig } from '@/core/engine/config'
 import { find, load } from '@/lib/config'
 import { logger } from '@/lib/logger'
-
-function defineConfig() {
-	return {}
-}
 
 export default async function (
 	options: Partial<{

@@ -1,10 +1,10 @@
 import * as yaml from 'js-yaml'
-import fs from 'fs'
+import { default as fse } from 'fs-extra'
 
 import { useEtherscan } from '@/lib/hooks/useEtherscan'
 import { AddressLike } from '@/lib/types'
 
-const config = yaml.load(fs.readFileSync('env.yaml', 'utf-8')) as {
+const config = yaml.load(fse.readFileSync('env.yaml', 'utf-8')) as {
 	[key: string]: {
 		[protocol: string]: AddressLike
 	}
@@ -20,11 +20,11 @@ const generateStaticReferences: (props: {
     export const ${name.replace(' ', '_').toUpperCase()}_NAME = '${name}'
     export const ${name.replace(' ', '_').toUpperCase()}_ABI = ${abi}`
 
-	if (!fs.existsSync(`./references/${key}`)) {
-		fs.mkdirSync(`./references/${key}`)
+	if (!fse.existsSync(`./references/${key}`)) {
+		fse.mkdirSync(`./references/${key}`)
 	}
 
-	fs.writeFileSync(`./references/${key}/index.ts`, protocolGeneration)
+	fse.writeFileSync(`./references/${key}/index.ts`, protocolGeneration)
 }
 
 const generateDynamicReferences: (props: {
@@ -49,12 +49,12 @@ const generateDynamicReferences: (props: {
 
 		const filename = sourceKey.replace('./', '').split('/').slice(-1)[0]
 
-		fs.mkdirSync(directory, {
+		fse.mkdirSync(directory, {
 			recursive: true
 		})
 
 		// Write the file to the folder.
-		fs.writeFileSync(`${directory}/${filename}`, value.content)
+		fse.writeFileSync(`${directory}/${filename}`, value.content)
 	})
 }
 
