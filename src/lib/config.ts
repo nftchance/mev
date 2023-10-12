@@ -1,14 +1,14 @@
 import { bundleRequire } from 'bundle-require'
 import { findUp } from 'find-up'
 import { default as fse } from 'fs-extra'
-import { resolve } from 'pathe'
+import { basename, resolve } from 'pathe'
+import pc from 'picocolors'
 import prettier from 'prettier'
 
-type MaybeArray<T> = T | T[]
+import { defineConfig } from '@/core/engine/config'
+import { logger } from '@/lib/logger'
 
-type Config = {
-	strategies: []
-}
+type MaybeArray<T> = T | T[]
 
 export const name = 'mev'
 
@@ -42,7 +42,7 @@ export async function load({
 	configPath
 }: {
 	configPath: string
-}): Promise<MaybeArray<Config>> {
+}): Promise<MaybeArray<ReturnType<typeof defineConfig>>> {
 	const res = await bundleRequire({
 		filepath: configPath
 	})
@@ -84,4 +84,32 @@ export async function format(content: string) {
 		// https://github.com/wagmi-dev/wagmi/issues/2971
 		plugins: []
 	})
+}
+
+export async function configs(
+	options: Partial<{
+		config: string
+		root: string
+	}> = {}
+): Promise<Array<ReturnType<typeof defineConfig>>> {
+	const configPath = await find({
+		config: options.config,
+		root: options.root
+	})
+
+	if (configPath) {
+		const resolvedConfigs = await load({ configPath })
+
+		const isArrayConfig = Array.isArray(resolvedConfigs)
+
+		logger.info(
+			`* Using config at index:\n\t${basename(pc.gray(configPath))}`
+		)
+
+		return isArrayConfig ? resolvedConfigs : [resolvedConfigs]
+	}
+
+	logger.warn(`! Could not find configuration file. Using default.`)
+
+	return [defineConfig()]
 }

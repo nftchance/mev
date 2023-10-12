@@ -34,10 +34,14 @@ const DEFAULT_RPC = {
 
 const DEFAULT_NETWORK: keyof typeof DEFAULT_RPC = 1
 
+// TODO: Create a default strategy that logs each block.
+const DEFAULT_STRATEGIES = {}
+
 export function defineConfig({
 	chainId,
 	references,
-	providers = DEFAULT_RPC
+	providers = DEFAULT_RPC,
+	strategies = DEFAULT_STRATEGIES
 }: Partial<{
 	chainId: keyof typeof DEFAULT_RPC
 	references: {
@@ -46,6 +50,7 @@ export function defineConfig({
 	}
 	// * Allow independent instances to provide their own providers.
 	providers: Record<string, Record<string, `wss://${string}`>>
+	strategies: Record<string, unknown>
 }> = {}) {
 	if (providers === DEFAULT_RPC)
 		logger.warn(
@@ -69,6 +74,10 @@ export function defineConfig({
 				)
 			])
 		),
-		references
+		references,
+		strategies: {
+			...DEFAULT_STRATEGIES,
+			...strategies
+		}
 	} as const
 }
