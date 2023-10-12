@@ -1,10 +1,12 @@
 import { configs } from '@/lib/config'
+import { getStrategyNames } from '@/lib/functions/strategies'
 
-export default async function (options: Parameters<typeof configs>[0] = {}) {
+export default async function (
+	options: Parameters<typeof configs>[number] = {}
+) {
 	for (const config of await configs(options)) {
-		// TODO: run the engine with the config
-		// TODO: Load the config.
+		const names = await getStrategyNames(config.strategies)
 
-		console.log('Will list all strategies')
+		console.table(names)
 	}
 }

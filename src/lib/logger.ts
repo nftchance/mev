@@ -19,6 +19,7 @@ export class Logger {
 		if (level >= this.logLevel) {
 			const color = this.getColor(level)
 			const logMessage = `[${LogLevel[level]}] ${message}`
+
 			console.log(color(logMessage))
 		}
 	}

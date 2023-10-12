@@ -35,7 +35,11 @@ const DEFAULT_RPC = {
 const DEFAULT_NETWORK: keyof typeof DEFAULT_RPC = 1
 
 // TODO: Create a default strategy that logs each block.
-const DEFAULT_STRATEGIES = {}
+const DEFAULT_STRATEGIES = {
+	block: {
+		log: () => {}
+	}
+}
 
 export function defineConfig({
 	chainId,
