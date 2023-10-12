@@ -8,12 +8,14 @@ export async function getStrategyNames(
 	for (const [key, value] of Object.entries(strategies)) {
 		if (typeof value === 'function') {
 			names.push(`${nameTree}${key}`)
-		} else {
+		} else if (value && typeof value === 'object') {
 			await getStrategyNames(
 				value as Record<string, unknown>,
 				names,
 				`${nameTree}${key}.`
 			)
+		} else if (value && typeof value !== 'object') {
+			names.push(`${nameTree}${key}`)
 		}
 	}
 

@@ -1,4 +1,4 @@
-import { configs } from '@/lib/config'
+import { configs } from '@/lib/functions/config'
 import { getStrategyNames } from '@/lib/functions/strategies'
 
 export default async function (
@@ -6,7 +6,13 @@ export default async function (
 ) {
 	for (const config of await configs(options)) {
 		const names = await getStrategyNames(config.strategies)
+		const statuses = names.map(() => 'PENDING')
 
-		console.table(names)
+		console.table(
+			names.map((name, index) => ({
+				name,
+				status: statuses[index]
+			}))
+		)
 	}
 }

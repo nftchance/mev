@@ -25,6 +25,7 @@ program
 	.command('start')
 	.option('-c --config <config>', 'Path to config file.')
 	.option('-r --root <root>', 'Path to root directory.')
+	.option('-s --strategy <strategy>', 'Strategy to run.')
 	.action(async options => await start(options))
 
 program.parse(process.argv)

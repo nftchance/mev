@@ -1,3 +1,4 @@
+import { MaybeArray } from '../types'
 import { bundleRequire } from 'bundle-require'
 import { findUp } from 'find-up'
 import { default as fse } from 'fs-extra'
@@ -8,16 +9,14 @@ import prettier from 'prettier'
 import { defineConfig } from '@/core/engine/config'
 import { logger } from '@/lib/logger'
 
-type MaybeArray<T> = T | T[]
-
-export const name = 'mev'
+export const name = 'mev' as const
 
 export const configFiles = [
 	`${name}.config.ts`,
 	`${name}.config.js`,
 	`${name}.config.mjs`,
 	`${name}.config.mts`
-]
+] as const
 
 export async function find({
 	config,

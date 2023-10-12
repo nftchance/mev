@@ -3,7 +3,7 @@ import { default as fse } from 'fs-extra'
 import { resolve } from 'pathe'
 import pc from 'picocolors'
 
-import { find, format, name, usingTypescript } from '@/lib/config'
+import { find, format, name, usingTypescript } from '@/lib/functions/config'
 import { logger } from '@/lib/logger'
 
 export default async function init(
