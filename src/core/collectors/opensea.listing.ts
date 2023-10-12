@@ -6,9 +6,9 @@ import {
 } from "@opensea/stream-js";
 import { OpenSeaSDK } from "opensea-js";
 
-import { Collector } from "../core/collector";
+import { Collector } from "../collector";
 
-import errors from "../lib/errors";
+import errors from "../../lib/errors";
 
 const key = "OpenseaListing" as const;
 
@@ -25,7 +25,7 @@ export class OpenseaListingCollector extends Collector<
         super(key, errors.Collector.OpenseaListing);
     }
 
-    getEventstream = async (stream: EventEmitter) => {
+    getCollectionStream = async (stream: EventEmitter) => {
         this.openseaStreamClient.onItemListed("*", (event: ItemListedEvent) => {
             this.emit(stream, {
                 listing: event.payload,

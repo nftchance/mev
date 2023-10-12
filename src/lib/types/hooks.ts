@@ -1,4 +1,4 @@
-import { AddressLike, Wallet, WebSocketProvider } from 'ethers'
+import { Wallet, providers } from 'ethers'
 
 export type ContractTransaction = {
     // Base transaction configuration
@@ -14,9 +14,9 @@ export type ContractTransaction = {
 }
 
 export type TransactionFilter = {
-    provider?: WebSocketProvider
-    from: AddressLike | AddressLike[]
-    to: AddressLike | AddressLike[]
+    provider?: providers.WebSocketProvider
+    from: `0x${string}` | Array<`0x${string}`>
+    to: `0x${string}` | Array<`0x${string}`>
     functionName: string
     status: 'pending' | 'confirmed' | 'failed' | 'any'
 }

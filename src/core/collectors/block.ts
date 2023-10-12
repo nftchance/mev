@@ -1,9 +1,9 @@
 import { EventEmitter } from "stream";
 import { providers } from "ethers";
 
-import { Collector } from "../core/collector";
+import { Collector } from "../collector";
 
-import errors from "../lib/errors";
+import errors from "../../lib/errors";
 
 const key = "NewBlock" as const;
 
@@ -18,7 +18,7 @@ export class BlockCollector extends Collector<
         super(key, errors.Collector.NewBlock);
     }
 
-    getEventStream = async (stream: EventEmitter) => {
+    getCollectionStream = async (stream: EventEmitter) => {
         this.client.on("block", async (blockNumber: number) => {
             const block = await this.client.getBlock(blockNumber);
 

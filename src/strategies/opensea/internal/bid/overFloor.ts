@@ -1,31 +1,17 @@
-import { Strategy } from '../lib/types'
-import { NewBlock, OpenseaOrder } from '../lib/types/collectors'
-import { MempoolTransaction } from '../executors/mempool'
-import { AddressLike } from '../lib/types/utils'
+import { Strategy } from '../../../../lib/types'
+import { NewBlock, OpenseaOrder } from '../../../../lib/types/collectors'
+import { MempoolTransaction } from '../../../../core/executors/mempool'
 
 import { ItemListedEventPayload } from '@opensea/stream-js'
-import { Contract, ContractTransaction, ethers } from 'ethers'
-
-const ARB_ABI: any[] = [
-    'function swapOpenSeaToSudoswap(OrderV2 order, uint256 startAmount, address sudoPool) external',
-]
+import { ethers } from 'ethers'
 
 type Event = OpenseaOrder | NewBlock
 type Action = MempoolTransaction
 
-type Config = {
-    arbContractAddress: AddressLike
-    bidPercentage: number
-}
-
-export const openseaInternalBidOverFloor: Strategy<Event, Action, Config> = ({
+export const overFloor: Strategy<Event, Action> = ({
     client,
-    openseaClient,
-    arbContractAddress,
-    bidPercentage,
+    openseaClient
 }) => {
-    const arbContract = new Contract(arbContractAddress, ARB_ABI, client)
-
     const processEvent = async (
         event: ReturnType<Event>,
     ): Promise<Action | void> => {
@@ -59,14 +45,13 @@ export const openseaInternalBidOverFloor: Strategy<Event, Action, Config> = ({
         )
             return
 
-        return await buildArbTransaction(event.listing)
+        return await buildTransaction(event.listing)
     }
 
     // Build arb transaction from order hash and pool params
-    const buildArbTransaction = async (
+    const buildTransaction = async (
         listing: ItemListedEventPayload
     ): Promise<Action | undefined> => {
-        // TODO: implement the real addresses
         const accountAddress = ethers.constants.AddressZero
         const protocolAddress = ethers.constants.AddressZero
 
@@ -115,11 +100,6 @@ export const openseaInternalBidOverFloor: Strategy<Event, Action, Config> = ({
         //     },
         // }
 
-        // mempoolSubmission
-
-        return
-
-        // TODO: Finish here by returning the prepared transaction
         // return useMempoolTransaction({
         //     client,
         //     transaction,
@@ -128,6 +108,8 @@ export const openseaInternalBidOverFloor: Strategy<Event, Action, Config> = ({
         //         bidPercentage,
         //     },
         // })
+
+        return
     }
 
     return { processEvent }

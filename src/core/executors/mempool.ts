@@ -1,6 +1,6 @@
 import { ContractTransaction, providers } from 'ethers'
 
-import { Executor } from '../lib/types/executors'
+import { Executor } from '../../lib/types/executors'
 
 // ! Actions that could be taken by executors.
 export type MempoolTransaction = (params: {

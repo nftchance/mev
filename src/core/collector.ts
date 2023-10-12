@@ -1,7 +1,7 @@
 import { EventEmitter } from "stream";
 
-import errors from "../lib/errors";
 import { Logger, logger } from "../lib/logger";
+import errors from "../lib/errors";
 
 type Errors = typeof errors.Collector;
 
@@ -25,7 +25,7 @@ export abstract class Collector<TKey extends keyof Errors, TCollection> {
     // ! This function is in this class, but the implementation
     //   happens in the child class. This is a design pattern called
     //   the Template Method Pattern.
-    getEventStream(stream: EventEmitter) {
+    getCollectionStream = async (stream: EventEmitter): Promise<void> => {
         throw new Error(
             `Collector [${this.key}]: getEventStream() not implemented.`,
         );
