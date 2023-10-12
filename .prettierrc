@@ -10,13 +10,8 @@
 	"plugins": ["@trivago/prettier-plugin-sort-imports"],
 	"importOrder": [
 		"<THIRD_PARTY_MODULES>",
-		"^@routes/(.*)$",
-		"^@lib/(.*)$",
-		"^@utils/(.*)$",
-		"^@components/(.*)$",
-		"^@/(.*)$",
-		"^[./]",
-		"^[../]"
+		"@/.*",
+		"(?=./styles.module.scss)"
 	],
 	"importOrderSeparation": true,
 	"importOrderSortSpecifiers": true,

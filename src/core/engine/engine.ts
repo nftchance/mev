@@ -1,11 +1,9 @@
 import { EventEmitter } from 'stream'
 
-// * Collectors
-import { BlockCollector } from '../collectors/block'
-import { OpenseaListingCollector } from '../collectors/opensea.listing'
-// * Executors
-import { Log } from '../executors/log'
-import { Strategy } from '../strategy'
+import { BlockCollector } from '@/core/collectors/block'
+import { OpenseaListingCollector } from '@/core/collectors/opensea.listing'
+import { Log } from '@/core/executors/log'
+import { Strategy } from '@/core/strategy'
 
 type Collectors = BlockCollector | OpenseaListingCollector
 type Actions = Log

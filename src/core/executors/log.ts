@@ -1,5 +1,5 @@
-import { logger } from '../../lib/logger'
-import { Executor } from '../executor'
+import { Executor } from '@/core/executor'
+import { logger } from '@/lib/logger'
 
 export type LogExecutionProps = {}
 export type LogExecution = { message: string }

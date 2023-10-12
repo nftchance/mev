@@ -1,7 +1,7 @@
 import { EventEmitter } from 'stream'
 
-import errors from '../lib/errors'
-import { Logger, logger } from '../lib/logger'
+import errors from '@/lib/errors'
+import { Logger, logger } from '@/lib/logger'
 
 type Errors = typeof errors.Collector
 

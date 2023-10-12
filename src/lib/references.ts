@@ -1,8 +1,8 @@
 import * as yaml from 'js-yaml'
 import fs from 'fs'
 
-import { useEtherscan } from './hooks/useEtherscan'
-import { AddressLike } from './types'
+import { useEtherscan } from '@/lib/hooks/useEtherscan'
+import { AddressLike } from '@/lib/types'
 
 const config = yaml.load(fs.readFileSync('env.yaml', 'utf-8')) as {
 	[key: string]: {

@@ -6,8 +6,8 @@ import {
 import { OpenSeaSDK } from 'opensea-js'
 import { EventEmitter } from 'stream'
 
-import errors from '../../lib/errors'
-import { Collector } from '../collector'
+import { Collector } from '@/core/collector'
+import errors from '@/lib/errors'
 
 const key = 'OpenseaListing' as const
 

@@ -1,4 +1,4 @@
-import { ethers, providers } from 'ethers'
+import { ethers } from 'ethers'
 import yaml from 'js-yaml'
 
 const env = yaml.load(

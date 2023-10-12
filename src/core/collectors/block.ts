@@ -1,8 +1,8 @@
 import { providers } from 'ethers'
 import { EventEmitter } from 'stream'
 
-import errors from '../../lib/errors'
-import { Collector } from '../collector'
+import { Collector } from '@/core/collector'
+import errors from '@/lib/errors'
 
 const key = 'NewBlock' as const
 

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { AddressLike } from '../types'
+import { AddressLike } from '@/lib/types'
 
 type Etherscan = (props: { address: AddressLike }) => Promise<{
 	abi: string

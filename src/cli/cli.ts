@@ -1,8 +1,8 @@
 import { Command } from 'commander'
 
-import init from './commands/init'
-import list from './commands/list'
-import start from './commands/start'
+import init from '@/cli/commands/init'
+import list from '@/cli/commands/list'
+import start from '@/cli/commands/start'
 
 const program = new Command()
 

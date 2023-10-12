@@ -1,5 +1,5 @@
-import DEFAULT_CONFIG from './config'
-import { Engine } from './engine'
+import DEFAULT_CONFIG from '@/core/engine/config'
+import { Engine } from '@/core/engine/engine'
 
 export class Runner {
 	constructor(
