@@ -5,7 +5,7 @@ export default async function (
 	options: Parameters<typeof configs>[number] = {}
 ) {
 	for (const config of await configs(options)) {
-		const names = await getStrategyNames(config.strategies)
+		const names = getStrategyNames(config.strategies)
 		const statuses = names.map(() => 'PENDING')
 
 		console.table(

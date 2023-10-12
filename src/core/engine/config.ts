@@ -37,7 +37,9 @@ const DEFAULT_NETWORK: keyof typeof DEFAULT_RPC = 1
 // TODO: Create a default strategy that logs each block.
 const DEFAULT_STRATEGIES = {
 	block: {
-		log: () => {}
+		log: () => {
+			logger.info('Ran block.log')
+		}
 	}
 } as const
 
