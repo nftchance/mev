@@ -1,5 +1,7 @@
 import { ethers } from 'ethers'
 
+import { logger } from '@/lib/logger'
+
 // * Resource to acquire public RPC node URLs to use as default:
 //   - https://chainlist.org/
 const DEFAULT_RPC = {
@@ -43,6 +45,11 @@ export function defineConfig({
 	// * Allow independent instances to provide their own providers.
 	providers: Record<string, Record<string, `wss://${string}`>>
 }> = {}) {
+	if (providers === DEFAULT_RPC)
+		logger.warn(
+			'! Using default RPC providers. This is not recommended in production.'
+		)
+
 	return {
 		// ! Wrap every RPC url in a WebSocketProvider.
 		providers: Object.fromEntries(
