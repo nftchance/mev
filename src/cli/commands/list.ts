@@ -1,7 +1,10 @@
-export default async function () {
-	// TODO: Load the config.
+import { configs } from '@/lib/config'
 
-	// TODO: Use a template literal to determine all the strategies that are available.
+export default async function (options: Parameters<typeof configs>[0] = {}) {
+	for (const config of await configs(options)) {
+		// TODO: run the engine with the config
+		// TODO: Load the config.
 
-	console.log('Will list all strategies')
+		console.log('Will list all strategies')
+	}
 }
