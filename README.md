@@ -5,11 +5,11 @@ This repository contains the MEV bot that has been evolved throughout the years.
 > Note:
 > In several places in this repository the supply of additional data is required than is simply needed. This is done to prevent loss of funds and maintain safe procedures as the highest priority. No amount of returns can offset the unexpectedly massive loss.
 
-- [Architecture](./docs/architecture.md)
-- [Configuration](./docs/configuration.md)
-- [Strategies](./docs/strategies.md)
-- [Wallets](./docs/wallets.md)
-- [Testing](./docs/testing.md)
+-   [Architecture](./docs/architecture.md)
+-   [Configuration](./docs/configuration.md)
+-   [Strategies](./docs/strategies.md)
+-   [Wallets](./docs/wallets.md)
+-   [Testing](./docs/testing.md)
 
 ## Getting Started
 

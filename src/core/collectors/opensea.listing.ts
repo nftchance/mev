@@ -1,35 +1,34 @@
-import { EventEmitter } from "stream";
 import {
-    ItemListedEvent,
-    ItemListedEventPayload,
-    OpenSeaStreamClient,
-} from "@opensea/stream-js";
-import { OpenSeaSDK } from "opensea-js";
+	ItemListedEvent,
+	ItemListedEventPayload,
+	OpenSeaStreamClient
+} from '@opensea/stream-js'
+import { OpenSeaSDK } from 'opensea-js'
+import { EventEmitter } from 'stream'
 
-import { Collector } from "../collector";
+import errors from '../../lib/errors'
+import { Collector } from '../collector'
 
-import errors from "../../lib/errors";
-
-const key = "OpenseaListing" as const;
+const key = 'OpenseaListing' as const
 
 export class OpenseaListingCollector extends Collector<
-    typeof key,
-    {
-        listing: ItemListedEventPayload;
-    }
+	typeof key,
+	{
+		listing: ItemListedEventPayload
+	}
 > {
-    constructor(
-        public readonly openseaClient: OpenSeaSDK,
-        public readonly openseaStreamClient: OpenSeaStreamClient,
-    ) {
-        super(key, errors.Collector.OpenseaListing);
-    }
+	constructor(
+		public readonly openseaClient: OpenSeaSDK,
+		public readonly openseaStreamClient: OpenSeaStreamClient
+	) {
+		super(key, errors.Collector.OpenseaListing)
+	}
 
-    getCollectionStream = async (stream: EventEmitter) => {
-        this.openseaStreamClient.onItemListed("*", (event: ItemListedEvent) => {
-            this.emit(stream, {
-                listing: event.payload,
-            });
-        });
-    };
+	getCollectionStream = async (stream: EventEmitter) => {
+		this.openseaStreamClient.onItemListed('*', (event: ItemListedEvent) => {
+			this.emit(stream, {
+				listing: event.payload
+			})
+		})
+	}
 }
