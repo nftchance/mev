@@ -10,9 +10,9 @@ type Config = {
 	strategies: []
 }
 
-const name = 'mev'
+export const name = 'mev'
 
-const configFiles = [
+export const configFiles = [
 	`${name}.config.ts`,
 	`${name}.config.js`,
 	`${name}.config.mjs`,

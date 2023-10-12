@@ -1,6 +1,6 @@
 import { Command } from 'commander'
 
-import init from '@/cli/commands/init'
+import { init } from '@/cli/commands/init'
 import list from '@/cli/commands/list'
 import start from '@/cli/commands/start'
 
@@ -23,7 +23,8 @@ program
 
 program
 	.command('start')
-	.option('-s, --strategy <strategy>', 'The strategy to run')
+	.option('-c --config <config>', 'Path to config file.')
+	.option('-r --root <root>', 'Path to root directory.')
 	.action(async options => await start(options))
 
 program.parse(process.argv)
