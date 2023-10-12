@@ -39,7 +39,7 @@ const DEFAULT_STRATEGIES = {
 	block: {
 		log: () => {}
 	}
-}
+} as const
 
 export function defineConfig({
 	chainId,
