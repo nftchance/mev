@@ -22,6 +22,6 @@
 			"@/*": ["src/*"]
 		}
 	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules/", "references/"]
+	// "include": ["src/**/*"],
+	"exclude": ["node_modules/", "references/", "dist", "tsup.config.ts"]
 }
