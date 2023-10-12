@@ -29,19 +29,16 @@ const DEFAULT_RPC = {
 
 const DEFAULT_NETWORK: keyof typeof DEFAULT_RPC = 1
 
-// const DEFAULT_REFERENCES = {
-// 	LSSVMPairFactory: '0xb16c1342E617A5B6E4b631EB114483FDB289c0A4',
-// 	LSSVMPairEnumerableETH: '0x08CE97807A81896E85841d74FB7E7B065ab3ef05',
-// 	Seaport: '0x00000000006c3852cbEf3e08E8dF289169EdE581'
-// } as const
-
 export function defineConfig({
 	chainId,
 	references,
 	providers = DEFAULT_RPC
 }: Partial<{
 	chainId: keyof typeof DEFAULT_RPC
-	references: Record<string, `0x${string}`>
+	references: {
+		etherscan: (address: string) => string
+		contracts: Record<string, `0x${string}`>
+	}
 	// * Allow independent instances to provide their own providers.
 	providers: Record<string, Record<string, `wss://${string}`>>
 }> = {}) {
