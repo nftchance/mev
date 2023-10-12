@@ -5,9 +5,8 @@ const env = yaml.load(
 	require('fs').readFileSync('./env.yaml', 'utf8')
 ) as Record<string, Record<string, string>>
 
-export default {
-	env,
-	provider: new ethers.providers.WebSocketProvider(
-		`wss://eth-mainnet.g.alchemy.com/v2/${env.rpcUrls.alchemy}`
-	)
-} as const
+export function defineConfig() {
+	return {
+		provider: new ethers.providers.WebSocketProvider(env.rpcUrls.default)
+	} as const
+}

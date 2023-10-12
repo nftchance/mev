@@ -6,7 +6,7 @@ import pc from 'picocolors'
 import { find, format, name, usingTypescript } from '@/lib/config'
 import { logger } from '@/lib/logger'
 
-export async function init(
+export default async function init(
 	options: Partial<{
 		config: string
 		root: string

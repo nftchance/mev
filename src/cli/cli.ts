@@ -1,6 +1,6 @@
 import { Command } from 'commander'
 
-import { init } from '@/cli/commands/init'
+import init from '@/cli/commands/init'
 import list from '@/cli/commands/list'
 import start from '@/cli/commands/start'
 
