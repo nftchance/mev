@@ -1,47 +1,16 @@
 import dotenv from 'dotenv'
 import { ethers } from 'ethers'
 
+import {
+	DEFAULT_NETWORK,
+	DEFAULT_RPC,
+	DEFAULT_STRATEGIES
+} from '@/core/engine/constants'
 import { logger } from '@/lib/logger'
 
 // * Load dotenv config here so that when a user imports the library
 //   they automatically have access to process.env based on their .env.
 dotenv.config()
-
-// * Resource to acquire public RPC node URLs to use as default:
-//   - https://chainlist.org/
-const DEFAULT_RPC = {
-	// ! Mainnet
-	1: {
-		default: 'wss://ethereum.publicnode.com'
-	},
-	// ! Optimism
-	10: {
-		default: 'wss://optimism.publicnode.com'
-	},
-	// ! Polygon
-	137: {
-		default: 'wss://polygon-bor.publicnode.com'
-	},
-	// ! Base
-	8453: {
-		default: 'wss://base.publicnode.com'
-	},
-	// ! Arbitrum
-	42161: {
-		default: 'wss://arbitrum-one.publicnode.com'
-	}
-} as const
-
-const DEFAULT_NETWORK: keyof typeof DEFAULT_RPC = 1
-
-// TODO: Create a default strategy that logs each block.
-const DEFAULT_STRATEGIES = {
-	block: {
-		log: () => {
-			logger.info('Ran block.log')
-		}
-	}
-} as const
 
 export function defineConfig({
 	chainId,

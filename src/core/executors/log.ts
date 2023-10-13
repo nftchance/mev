@@ -1,13 +1,10 @@
 import { Executor } from '@/core/executor'
 import { logger } from '@/lib/logger'
 
-export type LogExecutionProps = {}
 export type LogExecution = { message: string }
 
-export class Log<
-	TExecution extends LogExecution = LogExecution
-> extends Executor<TExecution> {
-	execute = async ({ message }: TExecution) => {
+export class LogExecutor extends Executor<LogExecution> {
+	execute = async ({ message }: LogExecution) => {
 		logger.info(message)
 	}
 }
