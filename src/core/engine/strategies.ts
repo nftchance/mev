@@ -23,7 +23,7 @@ export class BlockLog<
 	) => {
 		switch (key) {
 			case 'NewBlock':
-				return { message: collection.hash }
+				return { message: `Block Number: ${collection.number}` }
 		}
 
 		logger.error(`Strategy [${this.key}]: Invalid key [${key}]`)
