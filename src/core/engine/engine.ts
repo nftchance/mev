@@ -2,11 +2,10 @@ import { defineConfig } from './config'
 import { EventEmitter } from 'node:events'
 
 import { BlockCollector } from '@/core/collectors/block'
-import { OpenseaListingCollector } from '@/core/collectors/opensea.listing'
 import { LogExecutor } from '@/core/executors/log'
 import { Strategy } from '@/core/strategy'
 
-type Collectors = BlockCollector | OpenseaListingCollector
+type Collectors = BlockCollector
 type Actions = LogExecutor
 
 export class Engine {
@@ -43,22 +42,40 @@ export class Engine {
 				// * Will emit:
 				//   | 'Execution', ['Log', { ... }]
 				//   | 'Execution', ['SubmitTransaction', { ... }]
-				this.stream.on('Collection', async event => {
-					// * A strategy will always consume the collection however
-					//   that does not mean it will always be used. If there
-					//   is an action that needs to be taken, then we plan
-					//   on passing that to the configured Executors and if there
-					//   is no action to take we will go back to waiting for
-					//   future messages to arrive.
-					const execution = await strategy.processCollection(event)
+				// ? We use `Collection` as the key because this map is only creating
+				//   a hook per strategy rather than hook per connector per strategy.
+				//   That is not needed for Executors though because we assume them to
+				//   be optimistic which means if we are sending an Execution, it is
+				//   always meant to be run with the body that is provided, thus,
+				//   we can listen for the key of the Execution rather than `Execution`.
+				this.stream.on(
+					'Collection',
+					async ({
+						key,
+						collection
+					}: {
+						key: Collectors['key']
+						collection: Parameters<Collectors['emit']>[1]
+					}) => {
+						// * A strategy will always consume the collection however
+						//   that does not mean it will always be used. If there
+						//   is an action that needs to be taken, then we plan
+						//   on passing that to the configured Executors and if there
+						//   is no action to take we will go back to waiting for
+						//   future messages to arrive.
+						const execution = await strategy.processCollection(
+							key,
+							collection
+						)
 
-					// * If the strategy doesn't emit an action then
-					//   we don't need to do anything and resume listening.
-					if (execution === null) return
+						// * If the strategy doesn't emit an action then
+						//   we don't need to do anything and resume listening.
+						if (execution === undefined) return
 
-					// * Pass the need for Execution to the Executors.
-					this.stream.emit('Execution', execution)
-				})
+						// * Pass the need for Execution to the Executors.
+						this.stream.emit('Execution', execution)
+					}
+				)
 			}
 		)
 

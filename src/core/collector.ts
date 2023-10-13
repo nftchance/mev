@@ -14,7 +14,7 @@ export abstract class Collector<TKey extends keyof Errors, TCollection> {
 
 	emit(stream: EventEmitter, collection: TCollection) {
 		try {
-			stream.emit('Collection', [this.key, collection])
+			stream.emit('Collection', { key: this.key, collection })
 
 			logger.success(this.errors.SuccessPublishing(collection))
 		} catch (err) {
