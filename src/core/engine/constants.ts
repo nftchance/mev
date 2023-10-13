@@ -27,8 +27,6 @@ export const DEFAULT_RPC = {
 
 export const DEFAULT_NETWORK: keyof typeof DEFAULT_RPC = 1
 
-// TODO: Create a default strategy that logs each block.
-
 export const DEFAULT_STRATEGIES = {
 	block: {
 		log: new BlockLog()

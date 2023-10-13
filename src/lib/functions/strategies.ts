@@ -1,3 +1,5 @@
+import { Strategy } from '@/core/strategy'
+
 export function getStrategyNames<TStrategies extends Record<string, unknown>>(
 	strategies: TStrategies,
 	names: Array<string> = [],
@@ -6,11 +8,19 @@ export function getStrategyNames<TStrategies extends Record<string, unknown>>(
 	if (!strategies) return []
 
 	for (const [key, value] of Object.entries(strategies)) {
-		if (typeof value === 'function') {
+		// ! If the accessed object is a Strategy.
+		if (value instanceof Strategy) {
 			names.push(`${nameTree}${key}`)
-		} else if (value && typeof value === 'object') {
+		}
+
+		// ! If the accessed object is still an object with values (Record).
+		else if (value && typeof value === 'object') {
 			getStrategyNames(value as TStrategies, names, `${nameTree}${key}.`)
-		} else if (value && typeof value !== 'object') {
+		}
+
+		// ! If the accessed object is a primitive.
+		// * While this is not expected, it is possible.
+		else if (value && typeof value !== 'object') {
 			names.push(`${nameTree}${key}`)
 		}
 	}
