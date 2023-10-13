@@ -32,9 +32,7 @@ export default async function (options: Props = {}) {
 
 		ran = true
 
-		// TODO: run the engine with the config and strategies
-
-		const engine = new Engine()
+		await new Engine(config).run()
 	}
 
 	if (!ran) logger.warn('No strategies were run.')

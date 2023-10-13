@@ -1,4 +1,4 @@
-import { EventEmitter } from 'stream'
+import { EventEmitter } from 'node:events'
 
 import errors from '@/lib/errors'
 import { Logger, logger } from '@/lib/logger'

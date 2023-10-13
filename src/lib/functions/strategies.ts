@@ -1,5 +1,5 @@
-export function getStrategyNames(
-	strategies: Record<string, unknown>,
+export function getStrategyNames<TStrategies extends Record<string, unknown>>(
+	strategies: TStrategies,
 	names: Array<string> = [],
 	nameTree: string = ''
 ): Array<string> {
@@ -9,11 +9,7 @@ export function getStrategyNames(
 		if (typeof value === 'function') {
 			names.push(`${nameTree}${key}`)
 		} else if (value && typeof value === 'object') {
-			getStrategyNames(
-				value as Record<string, unknown>,
-				names,
-				`${nameTree}${key}.`
-			)
+			getStrategyNames(value as TStrategies, names, `${nameTree}${key}.`)
 		} else if (value && typeof value !== 'object') {
 			names.push(`${nameTree}${key}`)
 		}
@@ -22,8 +18,6 @@ export function getStrategyNames(
 	return names
 }
 
-// Now, create a function that takes the template of 'opensea.internal.bid.overFloor'
-// and returns the value of strategies.opensea.internal.bid.overFloor.
 export function getStrategy<TStrategies extends Record<string, unknown>>(
 	strategies: TStrategies,
 	name: string

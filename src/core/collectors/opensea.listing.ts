@@ -3,8 +3,8 @@ import {
 	ItemListedEventPayload,
 	OpenSeaStreamClient
 } from '@opensea/stream-js'
+import { EventEmitter } from 'node:events'
 import { OpenSeaSDK } from 'opensea-js'
-import { EventEmitter } from 'stream'
 
 import { Collector } from '@/core/collector'
 import errors from '@/lib/errors'

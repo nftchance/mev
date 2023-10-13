@@ -1,5 +1,5 @@
 import { providers } from 'ethers'
-import { EventEmitter } from 'stream'
+import { EventEmitter } from 'node:events'
 
 import { Collector } from '@/core/collector'
 import errors from '@/lib/errors'
