@@ -7,7 +7,6 @@ type TExecution = Parameters<LogExecutor['execute']>[0]
 
 export class BlockLog<
 	TCollector extends BlockCollector,
-    
 	TExecutor extends LogExecutor
 > extends Strategy<TCollector, TExecutor> {
 	// ! A new collection will arrive from the collector every time

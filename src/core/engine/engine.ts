@@ -3,11 +3,11 @@ import { EventEmitter } from 'node:events'
 
 import { BlockCollector } from '@/core/collectors/block'
 import { OpenseaListingCollector } from '@/core/collectors/opensea.listing'
-import { Log } from '@/core/executors/log'
+import { LogExecutor } from '@/core/executors/log'
 import { Strategy } from '@/core/strategy'
 
 type Collectors = BlockCollector | OpenseaListingCollector
-type Actions = Log
+type Actions = LogExecutor
 
 export class Engine {
 	constructor(
