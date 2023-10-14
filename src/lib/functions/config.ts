@@ -102,13 +102,13 @@ export async function configs(
 		const isArrayConfig = Array.isArray(resolvedConfigs)
 
 		logger.info(
-			`* Using config at index:\n\t${basename(pc.gray(configPath))}`
+			`Using config at index:\n\t${pc.gray(basename(configPath))}`
 		)
 
 		return isArrayConfig ? resolvedConfigs : [resolvedConfigs]
 	}
 
-	logger.warn(`! Could not find configuration file. Using default.`)
+	logger.warn(`Could not find configuration file. Using default.`)
 
 	return [defineConfig()]
 }

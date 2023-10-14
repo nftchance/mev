@@ -26,7 +26,7 @@ export class BlockLog<
 				return { message: `Block Number: ${collection.number}` }
 		}
 
-		logger.error(`Strategy [${this.key}]: Invalid key [${key}]`)
+		logger.error(`[${this.key}]: Invalid key [${key}]`)
 	}
 }
 

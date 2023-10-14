@@ -1,3 +1,6 @@
+import pc from 'picocolors'
+
+import { Engine } from '@/core/engine/engine'
 import { configs } from '@/lib/functions/config'
 import { getStrategy } from '@/lib/functions/strategies'
 import { logger } from '@/lib/logger'
@@ -12,9 +15,8 @@ export default async function (options: Props = {}) {
 
 	let ran = false
 
-	console.log('starting')
 	for (const config of await configs(options)) {
-		let strategies: Record<string, unknown> = config.strategies
+		let strategies: Record<string, any> = config.strategies
 
 		if (strategyName) {
 			const strategy = getStrategy<typeof config.strategies>(
@@ -22,20 +24,18 @@ export default async function (options: Props = {}) {
 				strategyName
 			)
 
-			console.log(strategy)
-
 			if (strategy === undefined) {
-				logger.warn(`Strategy ${strategyName} not found.`)
+				logger.warn(`Strategy '${pc.gray(strategyName)}' not found.`)
 				continue
 			}
 
-			strategies = { strategyName: strategy }
+			strategies = { [strategyName]: strategy }
 		}
 
 		ran = true
 
-		// await new Engine(config).run()
+		await new Engine(config, strategies).run()
 	}
 
-	if (!ran) logger.warn('No strategies were run.')
+	if (!ran) logger.error('No strategies were run.')
 }

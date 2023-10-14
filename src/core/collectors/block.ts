@@ -19,18 +19,22 @@ export class BlockCollector extends Collector<
 
 	getCollectionStream = async (stream: EventEmitter) => {
 		this.client.on('block', async (blockNumber: number) => {
-			const block = await this.client.getBlock(blockNumber)
+			try {
+				const block = await this.client.getBlock(blockNumber)
 
-			if (!block?.hash) {
-				this.logger.warn(this.errors.FailedRetrievingHash(blockNumber))
+				if (!block?.hash) {
+					this.logger.warn(
+						this.errors.FailedRetrievingHash(blockNumber)
+					)
+				}
 
-				return
+				this.emit(stream, {
+					hash: block.hash,
+					number: block.number
+				})
+			} catch (err) {
+				this.logger.error('Failed retrieving block.')
 			}
-
-			this.emit(stream, {
-				hash: block.hash,
-				number: block.number
-			})
 		})
 	}
 }

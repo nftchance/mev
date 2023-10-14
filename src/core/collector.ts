@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events'
 
 import errors from '@/lib/errors'
-import { Logger, logger } from '@/lib/logger'
+import { logger as dLogger, Logger } from '@/lib/logger'
 
 type Errors = typeof errors.Collector
 
@@ -9,16 +9,16 @@ export abstract class Collector<TKey extends keyof Errors, TCollection> {
 	constructor(
 		public readonly key: TKey,
 		public readonly errors: Errors[TKey],
-		public readonly logger: Logger = logger
+		public readonly logger: Logger = dLogger
 	) {}
 
 	emit(stream: EventEmitter, collection: TCollection) {
 		try {
 			stream.emit('Collection', { key: this.key, collection })
 
-			logger.success(this.errors.SuccessPublishing(collection))
+			this.logger.success(this.errors.SuccessPublishing(collection))
 		} catch (err) {
-			logger.error(this.errors.FailedPublishing(err))
+			this.logger.error(this.errors.FailedPublishing(err))
 		}
 	}
 

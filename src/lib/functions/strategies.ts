@@ -41,5 +41,5 @@ export function getStrategy<TStrategies extends Record<string, unknown>>(
 		strategy = strategy[piece] as TStrategies
 	}
 
-	return strategy
+	if (strategy instanceof Strategy) return strategy
 }

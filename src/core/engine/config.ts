@@ -1,58 +1,51 @@
 import dotenv from 'dotenv'
-import { ethers } from 'ethers'
 
+import { Collector } from '@/core/collector'
 import {
+	DEFAULT_COLLECTORS,
+	DEFAULT_EXECUTORS,
 	DEFAULT_NETWORK,
 	DEFAULT_RPC,
 	DEFAULT_STRATEGIES
 } from '@/core/engine/constants'
-import { logger } from '@/lib/logger'
+import { Executor } from '@/core/executor'
 
 // * Load dotenv config here so that when a user imports the library
 //   they automatically have access to process.env based on their .env.
 dotenv.config()
 
 export function defineConfig({
-	chainId,
 	references,
-	providers = DEFAULT_RPC,
+	defaultNetwork = DEFAULT_NETWORK,
+	networks = {},
+	collectors = DEFAULT_COLLECTORS,
+	executors = DEFAULT_EXECUTORS,
 	strategies = DEFAULT_STRATEGIES
 }: Partial<{
-	chainId: keyof typeof DEFAULT_RPC
 	references: {
 		etherscan: (address: string) => string
 		contracts: Record<string, `0x${string}`>
 	}
-	// * Allow independent instances to provide their own providers.
-	providers: Record<string, Record<string, `wss://${string}`>>
-	strategies: Record<string, unknown>
-}> = {}) {
-	if (providers === DEFAULT_RPC)
-		logger.warn(
-			'! Using default RPC providers. This is not recommended in production.'
-		)
-
-	return {
-		// ! Wrap every RPC url in a WebSocketProvider.
-		providers: Object.fromEntries(
-			Object.entries(providers).map(([key, value]) => [
-				key,
-				Object.fromEntries(
-					Object.entries(value).map(([key, value]) => [
-						key,
-						new ethers.providers.WebSocketProvider(
-							chainId
-								? providers[chainId].default
-								: providers[DEFAULT_NETWORK].default
-						)
-					])
-				)
-			])
-		),
-		references,
-		strategies: {
-			...DEFAULT_STRATEGIES,
-			...strategies
+	defaultNetwork: keyof typeof DEFAULT_RPC
+	networks: Record<
+		string,
+		{
+			rpc: `wss://${string}`
 		}
+	>
+	collectors: Array<Collector<any, any>>
+	executors: Array<Executor<any>>
+	strategies: Record<string, any>
+}> = {}) {
+	return {
+		references,
+		defaultNetwork,
+		networks,
+		collectors,
+		executors,
+		strategies:
+			collectors === DEFAULT_COLLECTORS && executors === DEFAULT_EXECUTORS
+				? { ...DEFAULT_STRATEGIES, ...strategies }
+				: strategies
 	} as const
 }

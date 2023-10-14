@@ -42,23 +42,23 @@ export class Logger {
 	}
 
 	success(message: string): void {
-		this.log(LogLevel.SUCCESS, message)
+		this.log(LogLevel.SUCCESS, `✔ ${message}`)
 	}
 
 	debug(message: string): void {
-		this.log(LogLevel.DEBUG, message)
+		this.log(LogLevel.DEBUG, `🐛 ${message}`)
 	}
 
 	info(message: string): void {
-		this.log(LogLevel.INFO, message)
+		this.log(LogLevel.INFO, `ℹ ${message}`)
 	}
 
 	warn(message: string): void {
-		this.log(LogLevel.WARN, message)
+		this.log(LogLevel.WARN, `⚠ ${message}`)
 	}
 
 	error(message: string): void {
-		this.log(LogLevel.ERROR, message)
+		this.log(LogLevel.ERROR, `✖ ${message}`)
 	}
 }
 

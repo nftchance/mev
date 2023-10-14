@@ -1,3 +1,7 @@
+import { BlockCollector } from '../collectors/block'
+import { LogExecutor } from '../executors/log'
+import { providers } from 'ethers'
+
 import { BlockLog } from '@/core/engine/strategies'
 
 // * Resource to acquire public RPC node URLs to use as default:
@@ -25,7 +29,26 @@ export const DEFAULT_RPC = {
 	}
 } as const
 
+export const DEFAULT_PROVIDERS = Object.fromEntries(
+	Object.entries(DEFAULT_RPC).map(([key, value]) => [
+		key,
+		Object.fromEntries(
+			Object.entries(value).map(([key, value]) => [
+				key,
+				new providers.WebSocketProvider(value)
+			])
+		)
+	])
+)
+
 export const DEFAULT_NETWORK: keyof typeof DEFAULT_RPC = 1
+
+const provider = new providers.WebSocketProvider(
+	DEFAULT_RPC[DEFAULT_NETWORK].default
+)
+
+export const DEFAULT_COLLECTORS = [new BlockCollector(provider)]
+export const DEFAULT_EXECUTORS = [new LogExecutor()]
 
 export const DEFAULT_STRATEGIES = {
 	block: {

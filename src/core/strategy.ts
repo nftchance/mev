@@ -8,7 +8,8 @@ export class Strategy<
 > {
 	constructor(public readonly key: string) {}
 
-	syncState = async () => logger.warn('BlockLog: requires no state sync.')
+	syncState = async () =>
+		logger.warn(`[${this.key}]: requires no state sync.`)
 
 	processCollection = async (
 		key: TCollector['key'],
