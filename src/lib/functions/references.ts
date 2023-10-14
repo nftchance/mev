@@ -1,14 +1,8 @@
-import * as yaml from 'js-yaml'
 import { default as fse } from 'fs-extra'
 
+import { defineConfig } from '@/core/engine/config'
 import { useEtherscan } from '@/lib/hooks/useEtherscan'
-import { AddressLike } from '@/lib/types'
-
-const config = yaml.load(fse.readFileSync('env.yaml', 'utf-8')) as {
-	[key: string]: {
-		[protocol: string]: AddressLike
-	}
-}
+import { logger } from '@/lib/logger'
 
 const generateStaticReferences: (props: {
 	key: string
@@ -20,9 +14,8 @@ const generateStaticReferences: (props: {
     export const ${name.replace(' ', '_').toUpperCase()}_NAME = '${name}'
     export const ${name.replace(' ', '_').toUpperCase()}_ABI = ${abi}`
 
-	if (!fse.existsSync(`./references/${key}`)) {
+	if (!fse.existsSync(`./references/${key}`))
 		fse.mkdirSync(`./references/${key}`)
-	}
 
 	fse.writeFileSync(`./references/${key}/index.ts`, protocolGeneration)
 }
@@ -31,8 +24,8 @@ const generateDynamicReferences: (props: {
 	name: string
 	source: string
 }) => Promise<void> = async ({ name, source }) => {
-	// Remove the double curly braces from the source code.
-	// @note I am not sure why this is happening, but it is solved now.
+	// * Remove the double curly braces from the source code.
+	// ! I am not sure why this is happening, but it is solved now.
 	source = source.replace('{{', '{')
 	source = source.replace('}}', '}')
 
@@ -53,30 +46,24 @@ const generateDynamicReferences: (props: {
 			recursive: true
 		})
 
-		// Write the file to the folder.
 		fse.writeFileSync(`${directory}/${filename}`, value.content)
 	})
 }
 
-const references = {} as {
-	[key: string]: {
-		abi: string
-		name: string
-		source: string
+export const generateReferences = async <
+	T extends ReturnType<typeof defineConfig>['references']
+>(
+	references: T
+) => {
+	if (references === undefined) {
+		logger.warn('No references defined.')
+		return
 	}
+
+	Object.entries(references.contracts).forEach(async ([key, value]) => {
+		const { abi, name, source } = await useEtherscan({ address: value })
+
+		generateStaticReferences({ key, name, abi })
+		generateDynamicReferences({ name, source })
+	})
 }
-
-Object.entries(config.protocols).forEach(async ([key, value]) => {
-	const { abi, name, source } = await useEtherscan({ address: value })
-
-	generateStaticReferences({ key, name, abi })
-	generateDynamicReferences({ name, source })
-
-	references[key] = {
-		name,
-		abi,
-		source
-	}
-})
-
-export default references
