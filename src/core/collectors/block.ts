@@ -2,7 +2,6 @@ import { providers } from 'ethers'
 import { EventEmitter } from 'node:events'
 
 import { Collector } from '@/core/collector'
-import errors from '@/lib/errors'
 
 const key = 'NewBlock' as const
 
@@ -14,7 +13,7 @@ export class BlockCollector extends Collector<
 	}
 > {
 	constructor(public readonly client: providers.WebSocketProvider) {
-		super(key, errors.Collector.NewBlock)
+		super(key)
 	}
 
 	getCollectionStream = async (stream: EventEmitter) => {
@@ -24,7 +23,7 @@ export class BlockCollector extends Collector<
 
 				if (!block?.hash) {
 					this.logger.warn(
-						this.errors.FailedRetrievingHash(blockNumber)
+						`[${this.key}]: Block [${blockNumber}] does not exist.`
 					)
 				}
 

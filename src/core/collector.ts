@@ -1,14 +1,10 @@
 import { EventEmitter } from 'node:events'
 
-import errors from '@/lib/errors'
 import { logger as dLogger, Logger } from '@/lib/logger'
 
-type Errors = typeof errors.Collector
-
-export abstract class Collector<TKey extends keyof Errors, TCollection> {
+export abstract class Collector<TKey extends string, TCollection> {
 	constructor(
 		public readonly key: TKey,
-		public readonly errors: Errors[TKey],
 		public readonly logger: Logger = dLogger
 	) {}
 
@@ -16,9 +12,9 @@ export abstract class Collector<TKey extends keyof Errors, TCollection> {
 		try {
 			stream.emit('Collection', { key: this.key, collection })
 
-			this.logger.success(this.errors.SuccessPublishing(collection))
+			this.logger.success(`[${this.key}]: ${JSON.stringify(collection)}`)
 		} catch (err) {
-			this.logger.error(this.errors.FailedPublishing(err))
+			this.logger.error(`[${this.key}]: ${err}`)
 		}
 	}
 
