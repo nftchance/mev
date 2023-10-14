@@ -8,3 +8,5 @@ export { Executor } from '@/core/executor'
 export { LogExecutor } from '@/core/executors/log'
 
 export { Strategy } from '@/core/strategy'
+
+export { Logger, logger } from '@/lib/logger'
