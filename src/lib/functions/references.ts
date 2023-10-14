@@ -61,7 +61,10 @@ export const generateReferences = async <
 	}
 
 	Object.entries(references.contracts).forEach(async ([key, value]) => {
-		const { abi, name, source } = await useEtherscan({ address: value })
+		const { abi, name, source } = await useEtherscan(
+			references.etherscan,
+			value
+		)
 
 		generateStaticReferences({ key, name, abi })
 		generateDynamicReferences({ name, source })

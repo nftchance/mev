@@ -2,6 +2,7 @@ import { Command } from 'commander'
 
 import config from '@/cli/commands/config'
 import init from '@/cli/commands/init'
+import references from '@/cli/commands/references'
 import start from '@/cli/commands/start'
 import strategies from '@/cli/commands/strategies'
 
@@ -29,14 +30,23 @@ program
 program
 	.command('config')
 	.description('List the active configurations.')
-	.action(async () => await config())
+	.option('-c --config <config>', 'Path to config file.')
+	.option('-r --root <root>', 'Path to root directory.')
+	.action(async options => await config(options))
 
 program
 	.command('strategies')
 	.description('List all strategies.')
-	.action(async () => await strategies())
+	.option('-c --config <config>', 'Path to config file.')
+	.option('-r --root <root>', 'Path to root directory.')
+	.action(async options => await strategies(options))
 
-// TODO: Implement reference generation.
+program
+	.command('references')
+	.description('Generate the references for the onchain mechanisms.')
+	.option('-c --config <config>', 'Path to config file.')
+	.option('-r --root <root>', 'Path to root directory.')
+	.action(async options => await references(options))
 
 program
 	.command('start')

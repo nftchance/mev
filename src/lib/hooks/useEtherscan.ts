@@ -1,19 +1,10 @@
 import axios from 'axios'
 
-import { AddressLike } from '@/lib/types'
-
-type Etherscan = (props: { address: AddressLike }) => Promise<{
-	abi: string
-	name: string
-	source: string
-}>
-
-export const useEtherscan: Etherscan = async ({ address }) => {
-	const etherscanApiKey = 'TZIQBTY59K1JUJUH22DKBUF9KDK65N57DN'
-
-	const url = `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apiKey=${etherscanApiKey}`
-
-	const response = await axios.get(url)
+export const useEtherscan = async (
+	url: (address: string) => string,
+	address: `0x${string}`
+) => {
+	const response = await axios.get(url(address))
 
 	const {
 		ABI: abi,
