@@ -15,7 +15,9 @@ const generateStaticReferences: (props: {
     export const ${name.replace(' ', '_').toUpperCase()}_ABI = ${abi}`
 
 	if (!fse.existsSync(`./references/${key}`))
-		fse.mkdirSync(`./references/${key}`)
+		fse.mkdirSync(`./references/${key}`, {
+			recursive: true
+		})
 
 	fse.writeFileSync(`./references/${key}/index.ts`, protocolGeneration)
 }
@@ -69,4 +71,12 @@ export const generateReferences = async <
 		generateStaticReferences({ key, name, abi })
 		generateDynamicReferences({ name, source })
 	})
+
+	logger.success(
+		`References generated for ${
+			Object.keys(references.contracts).length
+		} contracts.`
+	)
+
+	process.exit()
 }

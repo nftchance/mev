@@ -1,11 +1,11 @@
 import picocolors from 'picocolors'
 
 enum LogLevel {
-	SUCCESS,
 	DEBUG,
 	INFO,
 	WARN,
-	ERROR
+	ERROR,
+	SUCCESS
 }
 
 export class Logger {
