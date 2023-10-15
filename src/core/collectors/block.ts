@@ -32,7 +32,7 @@ export class BlockCollector extends Collector<
 					number: block.number
 				})
 			} catch (err) {
-				this.logger.error('Failed retrieving block.')
+				this.logger.error(`[${this.key}] Failed retrieving block.`)
 			}
 		})
 	}

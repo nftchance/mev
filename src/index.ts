@@ -2,20 +2,31 @@ export { defineConfig } from '@/core/engine/config'
 
 // ! Collectors
 export { Collector } from '@/core/collector'
-export { BlockCollector } from '@/core/collectors/block'
+export { BlockCollection, BlockCollector } from '@/core/collectors/block'
 
 export {
+	OpenseaCollectionOfferCollection,
 	OpenseaCollectionOfferCollector,
 	OpenseaCollector,
+	OpenseaItemBidCollection,
 	OpenseaItemBidCollector,
+	OpenseaItemCancelledCollection,
 	OpenseaItemCancelledCollector,
+	OpenseaItemMetadataCollection,
 	OpenseaItemMetadataCollector,
+	OpenseaItemOfferCollection,
 	OpenseaItemOfferCollector,
+	OpenseaItemSoldCollection,
 	OpenseaItemSoldCollector,
+	OpenseaItemTransferredCollection,
 	OpenseaItemTransferredCollector,
+	OpenseaListingCollection,
 	OpenseaListingCollector,
+	OpenseaOrderInvalidateCollection,
 	OpenseaOrderInvalidateCollector,
+	OpenseaOrderRevalidateCollection,
 	OpenseaOrderRevalidateCollector,
+	OpenseaTraitOfferCollection,
 	OpenseaTraitOfferCollector
 } from '@/core/collectors/opensea'
 
