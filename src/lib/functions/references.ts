@@ -14,12 +14,12 @@ const generateStaticReferences: (props: {
     export const ${name.replace(' ', '_').toUpperCase()}_NAME = '${name}'
     export const ${name.replace(' ', '_').toUpperCase()}_ABI = ${abi}`
 
-	if (!fse.existsSync(`./references/${key}`))
-		fse.mkdirSync(`./references/${key}`, {
+	if (!fse.existsSync(`./src/references/${key}`))
+		fse.mkdirSync(`./src/references/${key}`, {
 			recursive: true
 		})
 
-	fse.writeFileSync(`./references/${key}/index.ts`, protocolGeneration)
+	fse.writeFileSync(`./src/references/${key}/index.ts`, protocolGeneration)
 }
 
 const generateDynamicReferences: (props: {
@@ -36,7 +36,7 @@ const generateDynamicReferences: (props: {
 	}
 
 	Object.entries(contractSources).forEach(([sourceKey, value]) => {
-		const directory = `./references/${name}/${sourceKey
+		const directory = `./src/references/${name}/${sourceKey
 			.replace('./', '')
 			.split('/')
 			.slice(0, -1)
