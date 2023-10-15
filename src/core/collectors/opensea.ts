@@ -40,9 +40,12 @@ export class OpenseaCollector<
 	}
 }
 
-// ! TODO: There is probably a better way to do this, but I wanted to maintain the verbosity of unique
-//   collectors rather a single 'Opensea' collector. If you can think of a better way to
-//   implement this while maintaing the verbosity feel free to open a PR with an improvement.
+// ! TODO: There is probably a better way to do this, but I
+//         wanted to maintain the verbosity of unique
+//         collectors rather a single 'Opensea' collector. If
+//         you can think of a better way to implement this
+//         while maintaing the verbosity feel free to open a PR
+//         with an improvement.
 
 export class OpenseaItemMetadataCollector extends OpenseaCollector<'onItemMetadataUpdated'> {
 	constructor(public readonly openseaStreamClient: OpenSeaStreamClient) {
@@ -50,11 +53,19 @@ export class OpenseaItemMetadataCollector extends OpenseaCollector<'onItemMetada
 	}
 }
 
+export type OpenseaItemMetadataCollection = Parameters<
+	OpenseaItemMetadataCollector['emit']
+>[1]
+
 export class OpenseaItemCancelledCollector extends OpenseaCollector<'onItemCancelled'> {
 	constructor(public readonly openseaStreamClient: OpenSeaStreamClient) {
 		super('onItemCancelled', openseaStreamClient)
 	}
 }
+
+export type OpenseaItemCancelledCollection = Parameters<
+	OpenseaItemCancelledCollector['emit']
+>[1]
 
 export class OpenseaListingCollector extends OpenseaCollector<'onItemListed'> {
 	constructor(public readonly openseaStreamClient: OpenSeaStreamClient) {
@@ -62,11 +73,19 @@ export class OpenseaListingCollector extends OpenseaCollector<'onItemListed'> {
 	}
 }
 
+export type OpenseaListingCollection = Parameters<
+	OpenseaListingCollector['emit']
+>[1]
+
 export class OpenseaItemSoldCollector extends OpenseaCollector<'onItemSold'> {
 	constructor(public readonly openseaStreamClient: OpenSeaStreamClient) {
 		super('onItemSold', openseaStreamClient)
 	}
 }
+
+export type OpenseaItemSoldCollection = Parameters<
+	OpenseaItemSoldCollector['emit']
+>[1]
 
 export class OpenseaItemTransferredCollector extends OpenseaCollector<'onItemTransferred'> {
 	constructor(public readonly openseaStreamClient: OpenSeaStreamClient) {
@@ -74,11 +93,19 @@ export class OpenseaItemTransferredCollector extends OpenseaCollector<'onItemTra
 	}
 }
 
+export type OpenseaItemTransferredCollection = Parameters<
+	OpenseaItemTransferredCollector['emit']
+>[1]
+
 export class OpenseaItemOfferCollector extends OpenseaCollector<'onItemReceivedOffer'> {
 	constructor(public readonly openseaStreamClient: OpenSeaStreamClient) {
 		super('onItemReceivedOffer', openseaStreamClient)
 	}
 }
+
+export type OpenseaItemOfferCollection = Parameters<
+	OpenseaItemOfferCollector['emit']
+>[1]
 
 export class OpenseaItemBidCollector extends OpenseaCollector<'onItemReceivedBid'> {
 	constructor(public readonly openseaStreamClient: OpenSeaStreamClient) {
@@ -86,11 +113,19 @@ export class OpenseaItemBidCollector extends OpenseaCollector<'onItemReceivedBid
 	}
 }
 
+export type OpenseaItemBidCollection = Parameters<
+	OpenseaItemBidCollector['emit']
+>[1]
+
 export class OpenseaCollectionOfferCollector extends OpenseaCollector<'onCollectionOffer'> {
 	constructor(public readonly openseaStreamClient: OpenSeaStreamClient) {
 		super('onCollectionOffer', openseaStreamClient)
 	}
 }
+
+export type OpenseaCollectionOfferCollection = Parameters<
+	OpenseaCollectionOfferCollector['emit']
+>[1]
 
 export class OpenseaTraitOfferCollector extends OpenseaCollector<'onTraitOffer'> {
 	constructor(public readonly openseaStreamClient: OpenSeaStreamClient) {
@@ -98,14 +133,26 @@ export class OpenseaTraitOfferCollector extends OpenseaCollector<'onTraitOffer'>
 	}
 }
 
+export type OpenseaTraitOfferCollection = Parameters<
+	OpenseaTraitOfferCollector['emit']
+>[1]
+
 export class OpenseaOrderInvalidateCollector extends OpenseaCollector<'onOrderInvalidate'> {
 	constructor(public readonly openseaStreamClient: OpenSeaStreamClient) {
 		super('onOrderInvalidate', openseaStreamClient)
 	}
 }
 
+export type OpenseaOrderInvalidateCollection = Parameters<
+	OpenseaOrderInvalidateCollector['emit']
+>[1]
+
 export class OpenseaOrderRevalidateCollector extends OpenseaCollector<'onOrderRevalidate'> {
 	constructor(public readonly openseaStreamClient: OpenSeaStreamClient) {
 		super('onOrderRevalidate', openseaStreamClient)
 	}
 }
+
+export type OpenseaOrderRevalidateCollection = Parameters<
+	OpenseaOrderRevalidateCollector['emit']
+>[1]

@@ -37,3 +37,5 @@ export class BlockCollector extends Collector<
 		})
 	}
 }
+
+export type BlockCollection = Parameters<BlockCollector['emit']>[1]
