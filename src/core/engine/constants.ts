@@ -2,7 +2,7 @@ import { BlockCollector } from '../collectors/block'
 import { LogExecutor } from '../executors/log'
 import { providers } from 'ethers'
 
-import { BlockLog } from '@/core/engine/strategies'
+import { BlockLog } from '@/core/strategies/block.log'
 
 // * Resource to acquire public RPC node URLs to use as default:
 //   - https://chainlist.org/
