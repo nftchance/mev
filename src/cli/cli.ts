@@ -25,28 +25,28 @@ program
 	.description('Initialize a new mev project.')
 	.option('-c --config <config>', 'Path to config file.')
 	.option('-r --root <root>', 'Path to root directory.')
-	.action(async options => await init(options))
+	.action(init)
 
 program
 	.command('config')
 	.description('List the active configurations.')
 	.option('-c --config <config>', 'Path to config file.')
 	.option('-r --root <root>', 'Path to root directory.')
-	.action(async options => await config(options))
+	.action(config)
 
 program
 	.command('strategies')
 	.description('List all strategies.')
 	.option('-c --config <config>', 'Path to config file.')
 	.option('-r --root <root>', 'Path to root directory.')
-	.action(async options => await strategies(options))
+	.action(strategies)
 
 program
 	.command('references')
 	.description('Generate the references for the onchain mechanisms.')
 	.option('-c --config <config>', 'Path to config file.')
 	.option('-r --root <root>', 'Path to root directory.')
-	.action(async options => await references(options))
+	.action(references)
 
 program
 	.command('start')
@@ -54,6 +54,9 @@ program
 	.option('-c --config <config>', 'Path to config file.')
 	.option('-r --root <root>', 'Path to root directory.')
 	.option('-s --strategy <strategy>', 'Strategy to run.')
-	.action(async options => await start(options))
+	.action(start)
 
-program.parse(process.argv)
+// Run commander with async/await.
+;(async function () {
+	await program.parseAsync(process.argv)
+})()

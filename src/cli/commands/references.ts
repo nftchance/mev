@@ -10,6 +10,6 @@ export default async function (
 	//       build-time taking longer than it should.
 
 	for (const config of await configs(options)) {
-		generateReferences(config.references)
+		await generateReferences(config.references)
 	}
 }
