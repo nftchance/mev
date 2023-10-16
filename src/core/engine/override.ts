@@ -1,4 +1,4 @@
-import { providers, Transaction, utils, Wallet } from 'ethers'
+import { providers, utils, Wallet } from 'ethers'
 import { AccessList } from 'ethers/lib/utils'
 
 // ! Geth Implementation Reference used to architect this class:
@@ -13,10 +13,10 @@ export type State = Partial<{
 	code: `0x${string}`
 	// ! Fake key-value mapping to override all slots in the
 	//   account storage before executing the call.
-	state: Record<any, any>
-	// ! Fake key-value mapping to override individual slots in the account
-	//   storage before executing the call.
-	stateDiff: Record<any, any>
+	state: Record<`0x${string}`, any>
+	// ! Fake key-value mapping to override individual slots in
+	//   the account storage before executing the call.
+	stateDiff: Record<`0x${string}`, any>
 }>
 
 export class StateOverride<T extends providers.JsonRpcProvider> {
@@ -32,13 +32,15 @@ export class StateOverride<T extends providers.JsonRpcProvider> {
 	) {}
 
 	// * Add the state override to an adddress.
-	addStateToAddress = async (address: `0x${string}`, state: State) => {
+	addStateToAddress = (address: `0x${string}`, state: State) => {
 		const isValid = utils.isAddress(address)
 
 		if (!isValid) {
 			throw new Error(`Invalid address: ${address}`)
 		}
 
+		// ! Maintain the base state already set for this address
+		//   override it with the new state if it exists.
 		this.state[address] = {
 			...this.state[address],
 			...state
@@ -46,7 +48,7 @@ export class StateOverride<T extends providers.JsonRpcProvider> {
 	}
 
 	// * Add state override to a random address and return address.
-	addState = async (state: State) => {
+	addState = (state: State) => {
 		const randomAddress = Wallet.createRandom().address as `0x${string}`
 
 		this.addStateToAddress(randomAddress, state)
@@ -54,30 +56,38 @@ export class StateOverride<T extends providers.JsonRpcProvider> {
 		return randomAddress
 	}
 
+	// ! If we do not provide the hex values that is okay because
+	//   it will automatically be converted to the proper JSON-RPC format.
+	hex = (
+		transaction: Parameters<
+			typeof providers.JsonRpcProvider.hexlifyTransaction
+		>[0]
+	) => {
+		// * This will make all the values of the transaction safe as well as
+		//   make sure the `accessList` is all setup.
+		return providers.JsonRpcProvider.hexlifyTransaction(transaction)
+	}
+
 	// * Simulate the transaction and return the access list and gas used.
 	simulate = async (
-		transaction: Transaction,
+		transaction: Parameters<typeof this.hex>[0],
 		block: number | 'latest' | 'pending'
 	): Promise<{
 		accessList: AccessList
 		gasUsed: `0x${string}`
 	}> => {
 		return await this.client.send('eth_createAccessList', [
-			transaction,
+			this.hex(transaction),
 			block
 		])
 	}
 
 	// * Submit an `eth_call` with the state override.
 	call = async (
-		transaction: Transaction,
+		transaction: Parameters<typeof this.hex>[0],
 		block: number | 'latest' | 'pending'
 	) => {
 		// ! Calculate the `accessList` if it has not been declared.
-		// * When building for speed, we do not want to calculate the
-		//   access list for every call. Instead, we want to calculate
-		//   it once and then use the same access list for every call
-		//   so you can toggle the `fast` flag to true to bypass this.
 		if (this.fast === false && transaction.accessList === undefined) {
 			const accessList = (await this.simulate(transaction, block))
 				.accessList
@@ -89,7 +99,7 @@ export class StateOverride<T extends providers.JsonRpcProvider> {
 		}
 
 		return await this.client.send('eth_call', [
-			transaction,
+			this.hex(transaction),
 			block,
 			this.state
 		])

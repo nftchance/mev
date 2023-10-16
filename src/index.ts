@@ -1,4 +1,5 @@
 export { defineConfig } from '@/core/engine/config'
+export { State, StateOverride } from '@/core/engine/override'
 
 // ! Collectors
 export { Collector } from '@/core/collector'
