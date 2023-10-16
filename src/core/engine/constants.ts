@@ -55,3 +55,11 @@ export const DEFAULT_STRATEGIES = {
 		log: new BlockLog()
 	}
 } as const
+
+export const DEFAULT_NETWORKS = {} as const
+
+export const DEFAULT_ETHERSCAN = (address: string): string => {
+	throw new Error(
+		'Must implement `etherscan()` in `mev.config.ts.defineConfig({ references: { etherscan: <function> }})` to generate references for deployed contracts.'
+	)
+}

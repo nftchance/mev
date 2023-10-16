@@ -5,6 +5,7 @@ import {
 	DEFAULT_COLLECTORS,
 	DEFAULT_EXECUTORS,
 	DEFAULT_NETWORK,
+	DEFAULT_NETWORKS,
 	DEFAULT_RPC,
 	DEFAULT_STRATEGIES
 } from '@/core/engine/constants'
@@ -15,17 +16,22 @@ import { Executor } from '@/core/executor'
 dotenv.config()
 
 export function defineConfig({
-	references,
+	references = {},
 	defaultNetwork = DEFAULT_NETWORK,
-	networks = {},
+	networks = DEFAULT_NETWORKS,
 	collectors = DEFAULT_COLLECTORS,
 	executors = DEFAULT_EXECUTORS,
 	strategies = DEFAULT_STRATEGIES
 }: Partial<{
-	references: {
+	references: Partial<{
+		artifacts: string
 		etherscan: (address: string) => string
+		bytecode: (
+			address: string,
+			block: number | 'latest' | 'pending'
+		) => Promise<string>
 		contracts: Record<string, `0x${string}`>
-	}
+	}>
 	defaultNetwork: keyof typeof DEFAULT_RPC
 	networks: Record<
 		string,
