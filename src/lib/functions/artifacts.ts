@@ -55,11 +55,14 @@ export async function getArtifacts(
 				//   that inherits from it.
 				if (bytecode === '0x') bytecode = undefined
 
+				if (deployedBytecode === '0x') deployedBytecode = undefined
+
 				return {
 					key: name.replace('.sol', ''),
 					name,
 					abi: JSON.stringify(abi),
-					bytecode
+					bytecode,
+                    deployedBytecode
 				}
 			})
 	)

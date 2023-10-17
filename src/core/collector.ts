@@ -11,8 +11,6 @@ export abstract class Collector<TKey extends string, TCollection> {
 	emit(stream: EventEmitter, collection: TCollection) {
 		try {
 			stream.emit('Collection', { key: this.key, collection })
-
-			this.logger.success(`[${this.key}]: ${JSON.stringify(collection)}`)
 		} catch (err) {
 			this.logger.error(`[${this.key}]: ${err}`)
 		}

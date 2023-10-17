@@ -87,17 +87,6 @@ export class StateOverride<T extends providers.JsonRpcProvider> {
 		transaction: Parameters<typeof this.hex>[0],
 		block: number | 'latest' | 'pending'
 	) => {
-		// ! Calculate the `accessList` if it has not been declared.
-		if (this.fast === false && transaction.accessList === undefined) {
-			const accessList = (await this.simulate(transaction, block))
-				.accessList
-
-			transaction = {
-				...transaction,
-				accessList
-			}
-		}
-
 		return await this.client.send('eth_call', [
 			this.hex(transaction),
 			block,
