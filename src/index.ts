@@ -4,7 +4,10 @@ export { State, StateOverride } from '@/core/engine/override'
 // ! Collectors
 export { Collector } from '@/core/collector'
 export { BlockCollection, BlockCollector } from '@/core/collectors/block'
-
+export {
+	HeartbeatCollection,
+	HeartbeatCollector
+} from '@/core/collectors/heartbeat'
 export {
 	OpenseaCollectionOfferCollection,
 	OpenseaCollectionOfferCollector,
@@ -33,6 +36,7 @@ export {
 
 // ! Executors
 export { Executor } from '@/core/executor'
+export { FlashbotsExecutor } from '@/core/executors/flashbots'
 export { LogExecutor } from '@/core/executors/log'
 export { MempoolExecutor } from '@/core/executors/mempool'
 

@@ -1,0 +1,42 @@
+{
+	"Collector": {
+		"scope": "javascript,typescript",
+		"prefix": "Collector",
+		"body": [
+			"import { EventEmitter } from 'node:events'",
+			"import { Collector } from '@/core/collector'",
+			"",
+			"const key = '$1' as const",
+			"",
+			"export class $1Collector extends Collector<typeof key, {$2}> {",
+			"\tconstructor($3) {",
+			"\t\tsuper(key)",
+			"\t}",
+			"",
+			"\tgetCollectionStream = async (stream: EventEmitter) => {",
+			"\t\t$4this.emit(stream, {$5})",
+			"\t}",
+			"}",
+			"",
+			"export type $1Collection = Parameters<$1Collector['emit']>[1]"
+		],
+		"description": "Create a new Collector."
+	},
+	"Executor": {
+		"scope": "javascript,typescript",
+		"prefix": "Executor",
+		"body": [
+			"import { Executor } from '@/core/executor'",
+			"import { logger } from '@/lib/logger'",
+			"",
+			"export class $1Executor<",
+			"\tTExecution extends {$2} = {$2}",
+			"> extends Executor<TExecution> {",
+			"\texecute = async ({ message }: TExecution) => {",
+			"\t\tlogger.info(message)",
+			"\t}",
+			"}"
+		],
+		"description": "Create a new Executor."
+	}
+}
