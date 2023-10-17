@@ -34,6 +34,7 @@ export {
 // ! Executors
 export { Executor } from '@/core/executor'
 export { LogExecutor } from '@/core/executors/log'
+export { MempoolExecutor } from '@/core/executors/mempool'
 
 // ! Strategies
 export { Strategy } from '@/core/strategy'

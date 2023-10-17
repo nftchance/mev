@@ -1,56 +1,45 @@
 // import { ContractTransaction, providers } from 'ethers'
+import { providers, Wallet } from 'ethers'
 
-// import { Executor } from '../../lib/types/executors'
+import { Executor } from '@/core/executor'
 
-// // ! Actions that could be taken by executors.
-// export type MempoolTransaction = (params: {
-//     client: providers.WebSocketProvider
-// }) => {
-//     transaction: ContractTransaction
-//     gasInfo?: {
-//         // Total profit expected from an opportunity.
-//         totalProfit: number
-//         // Percentage of bid profit to use for gas.
-//         bidPercentage?: number
-//     }
-// }
+export class MempoolExecutor<
+	TExecution extends {
+		transaction: providers.TransactionRequest
+		gasInfo?: {
+			totalProfit: number
+			bidPercentage?: number
+		}
+	}
+> extends Executor<TExecution> {
+	constructor(public readonly signer: Wallet) {
+		super()
+	}
 
-// export const useMempoolTransaction: Executor<MempoolTransaction> = ({
-//     client,
-// }) => {
-//     const execute = async ({
-//         transaction,
-//         gasInfo,
-//     }: ReturnType<MempoolTransaction>) => {
-//         client
-//         transaction
-//         gasInfo
+	execute = async ({ transaction, gasInfo }: TExecution) => {
+		// ! Estimate the gas consumption.
+		const gasEstimate = await this.signer.provider.estimateGas(transaction)
 
-//         // const gasUsage = await client.estimateGas(transaction)
-//         // gasUsage
+		let bidGasPrice = 0n
+		if (gasInfo) {
+			const breakEvenGasPrice =
+				BigInt(gasInfo.totalProfit) / BigInt(gasEstimate.toString())
 
-//         // let bidGasPrice = 0n
-//         // if (gasInfo !== undefined && gasInfo.bidPercentage !== undefined) {
-//         //     // Gas price at which we'd break event, meaning 100% of profit goes to validator.
-//         //     const breakEvenGasPrice =
-//         //         BigInt(gasInfo.totalProfit) / BigInt(gasUsage)
+			// ! A portion of the potential profit is used for gas.
+			bidGasPrice =
+				(breakEvenGasPrice * BigInt(gasInfo.bidPercentage || 0)) / 100n
+		} else {
+			// ! Use the blocks current gas price if one was not provided.
+			bidGasPrice = await this.signer.provider
+				.getFeeData()
+				.then(feeData =>
+					BigInt(feeData?.maxFeePerGas?.toString() || '0')
+				)
+		}
 
-//         //     // Gas price corresponding to the bid percentage.
-//         //     bidGasPrice = breakEvenGasPrice * BigInt(gasInfo.bidPercentage)
-//         // } else {
-//         //     // Use the blocks current gas price if one was not provided.
-//         //     const feeData = await client.getFeeData()
+		transaction.gasPrice = bidGasPrice
 
-//         //     bidGasPrice = feeData?.maxFeePerGas ?? 0n
-//         // }
-
-//         // // Update the gas price in the transaction.
-//         // // TODO: Gas "could" be zero if the block doesn't get mined.
-//         // transaction.gasPrice = bidGasPrice
-
-//         // // TODO: Send the transaction.
-//         // // await client.send
-//     }
-
-//     return { execute }
-// }
+		// ! Send the transaction.
+		await this.signer.sendTransaction(transaction)
+	}
+}
