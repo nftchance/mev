@@ -5,13 +5,12 @@ import { Collector } from '@/core/collector'
 
 const key = 'NewBlock' as const
 
-export class BlockCollector extends Collector<
-	typeof key,
-	{
-		hash: string
-		number: number
-	}
-> {
+export type BlockCollection = {
+	hash: string
+	number: number
+}
+
+export class BlockCollector extends Collector<typeof key, BlockCollection> {
 	constructor(public readonly client: providers.WebSocketProvider) {
 		super(key)
 	}
@@ -37,5 +36,3 @@ export class BlockCollector extends Collector<
 		})
 	}
 }
-
-export type BlockCollection = Parameters<BlockCollector['emit']>[1]

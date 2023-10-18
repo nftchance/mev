@@ -4,7 +4,14 @@ import { Collector } from '@/core/collector'
 
 const key = 'Heartbeat' as const
 
-export class HeartbeatCollector extends Collector<typeof key, {}> {
+export type HeartbeatCollection = {
+	nonce: number
+}
+
+export class HeartbeatCollector extends Collector<
+	typeof key,
+	HeartbeatCollection
+> {
 	public nonce = 0
 
 	constructor(public readonly rate: number) {
@@ -19,5 +26,3 @@ export class HeartbeatCollector extends Collector<typeof key, {}> {
 		}, this.rate)
 	}
 }
-
-export type HeartbeatCollection = Parameters<HeartbeatCollector['emit']>[1]
