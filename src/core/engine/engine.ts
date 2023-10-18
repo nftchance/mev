@@ -28,7 +28,7 @@ export class Engine<
 		// ! This is run first so that we always have Executors
 		//   listening for actions when the collectors start.
 		const executorsPromise = this.config.executors.map(async executor =>
-			this.stream.on('Execution', async action => {
+			this.stream.on(executor.key, async action => {
 				await executor.execute(action)
 			})
 		)

@@ -12,6 +12,7 @@ export class HeartbeatCollector extends Collector<
 	typeof key,
 	HeartbeatCollection
 > {
+	public static key = key
 	public nonce = 0
 
 	constructor(public readonly rate: number) {

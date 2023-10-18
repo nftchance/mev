@@ -26,6 +26,8 @@ export class OpenseaCollector<
 	// ! Recover the callback parameter type from the OpenSeaStreamClient.
 	Parameters<Parameters<OpenSeaStreamClient[TKey]>[1]>[0]['payload']
 > {
+	public static key = key
+
 	constructor(
 		public readonly collectorKey: TKey,
 		public readonly openseaStreamClient: OpenSeaStreamClient

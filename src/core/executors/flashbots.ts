@@ -22,6 +22,7 @@ const key = 'Flashbots' as const
 export class FlashbotsExecutor<
 	TExecution extends FlashbotsExecution
 > extends Executor<typeof key, TExecution> {
+	public static key = key
 	public flashbotsClient: FlashbotsBundleProvider | undefined
 
 	constructor(

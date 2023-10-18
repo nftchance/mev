@@ -16,6 +16,8 @@ const key = 'Mempool' as const
 export class MempoolExecutor<
 	TExecution extends MempoolExecution = MempoolExecution
 > extends Executor<typeof key, TExecution> {
+	public static key = key
+
 	constructor(public readonly signer: Wallet) {
 		super(key)
 	}
