@@ -6,12 +6,10 @@ export default async function (
 ) {
 	for (const config of await configs(options)) {
 		const names = getStrategyNames(config.strategies)
-		const statuses = names.map(() => 'PENDING')
 
 		console.table(
 			names.map((name, index) => ({
-				name,
-				status: statuses[index]
+				name
 			}))
 		)
 	}
