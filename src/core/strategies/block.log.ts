@@ -20,12 +20,11 @@ export class BlockLog<
 	) => {
 		switch (key) {
 			case 'NewBlock':
-				const execution = {
+				// ! When a new block is received, go ahead and log it.
+				return {
 					key: `${LogExecutor.key}Execution`,
 					execution: { message: `Block Number: ${collection.number}` }
 				} as const
-
-				return execution
 		}
 
 		logger.error(`[${this.key}]: Invalid key [${key}]`)
