@@ -12,4 +12,6 @@ export default async function (
 	for (const config of await configs(options)) {
 		await generateReferences(config.references)
 	}
+
+	process.exit()
 }

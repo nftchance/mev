@@ -117,7 +117,7 @@ export const generateReferences = async <
 						address
 					)
 
-					return { key, address, name, abi, source }
+					return { key, address, name: key, abi, source }
 				}
 			)
 		)
@@ -154,6 +154,4 @@ export const generateReferences = async <
 	})
 
 	logger.success(`References generated for ${responses.length} contracts.`)
-
-	process.exit()
 }
