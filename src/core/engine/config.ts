@@ -40,7 +40,7 @@ export function defineConfig({
 		}
 	>
 	collectors: Array<Collector<any, any>>
-	executors: Array<Executor<any>>
+	executors: Array<Executor<any, any>>
 	strategies: Record<string, any>
 }> = {}) {
 	return {

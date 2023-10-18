@@ -17,16 +17,18 @@ export type FlashbotsExecution = {
 	}>
 }
 
+const key = 'Flashbots' as const
+
 export class FlashbotsExecutor<
 	TExecution extends FlashbotsExecution
-> extends Executor<TExecution> {
+> extends Executor<typeof key, TExecution> {
 	public flashbotsClient: FlashbotsBundleProvider | undefined
 
 	constructor(
 		public readonly client: providers.WebSocketProvider,
 		public readonly signer: Wallet
 	) {
-		super()
+		super(key)
 	}
 
 	init = async () => {

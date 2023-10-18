@@ -8,7 +8,7 @@ import { logger } from '@/lib/logger'
 
 export class Engine<
 	TCollectors extends Collector<any, any>,
-	TExecutors extends Executor<any>,
+	TExecutors extends Executor<any, any>,
 	TStrategies extends Record<string, Strategy<TCollectors, TExecutors>>
 > {
 	constructor(

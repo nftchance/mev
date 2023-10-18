@@ -4,7 +4,7 @@ import { logger } from '@/lib/logger'
 
 export class Strategy<
 	TCollector extends Collector<any, any>,
-	TExecutor extends Executor<any>
+	TExecutor extends Executor<any, any>
 > {
 	constructor(public readonly key: string) {}
 

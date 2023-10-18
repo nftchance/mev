@@ -1,3 +1,4 @@
+export { Abstract } from '@/core/abstract'
 export { defineConfig } from '@/core/engine/config'
 export { State, StateOverride } from '@/core/engine/override'
 

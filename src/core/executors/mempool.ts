@@ -11,11 +11,13 @@ export type MempoolExecution = {
 	}
 }
 
+const key = 'Mempool' as const
+
 export class MempoolExecutor<
 	TExecution extends MempoolExecution = MempoolExecution
-> extends Executor<TExecution> {
+> extends Executor<typeof key, TExecution> {
 	constructor(public readonly signer: Wallet) {
-		super()
+		super(key)
 	}
 
 	execute = async ({ transaction, gasInfo }: TExecution) => {

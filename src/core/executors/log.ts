@@ -3,9 +3,15 @@ import { logger } from '@/lib/logger'
 
 export type LogExecution = { message: string }
 
+const key = 'Log' as const
+
 export class LogExecutor<
 	TExecution extends LogExecution = LogExecution
-> extends Executor<TExecution> {
+> extends Executor<typeof key, TExecution> {
+	constructor() {
+		super(key)
+	}
+
 	execute = async ({ message }: TExecution) => {
 		logger.info(message)
 	}

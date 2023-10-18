@@ -1,4 +1,3 @@
-import { MaybeArray } from '../types'
 import { bundleRequire } from 'bundle-require'
 import { findUp } from 'find-up'
 import { default as fse } from 'fs-extra'
@@ -8,6 +7,8 @@ import prettier from 'prettier'
 
 import { defineConfig } from '@/core/engine/config'
 import { logger } from '@/lib/logger'
+
+export type MaybeArray<T> = T | T[]
 
 export const name = 'mev' as const
 

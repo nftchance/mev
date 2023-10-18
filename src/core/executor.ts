@@ -1,5 +1,12 @@
-export abstract class Executor<TExecution> {
-	execute = async (execution: TExecution): Promise<void> => {
-		throw new Error('Not implemented.')
+import { Abstract } from '@/core/abstract'
+
+export abstract class Executor<
+	TKey extends string,
+	TExecution
+> extends Abstract<`${TKey}Execution`> {
+	constructor(key: TKey) {
+		super(`${key}Execution`)
 	}
+
+	abstract execute: (execution: TExecution) => Promise<void>
 }
