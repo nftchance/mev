@@ -1,16 +1,18 @@
 // import { ContractTransaction, providers } from 'ethers'
-import { providers, Wallet } from 'ethers'
+import { BigNumber, PopulatedTransaction, Wallet } from 'ethers'
 
 import { Executor } from '@/core/executor'
 
-export class MempoolExecutor<
-	TExecution extends {
-		transaction: providers.TransactionRequest
-		gasInfo?: {
-			totalProfit: number
-			bidPercentage?: number
-		}
+export type MempoolExecution = {
+	transaction: PopulatedTransaction
+	gasInfo?: {
+		totalProfit: number
+		bidPercentage?: number
 	}
+}
+
+export class MempoolExecutor<
+	TExecution extends MempoolExecution = MempoolExecution
 > extends Executor<TExecution> {
 	constructor(public readonly signer: Wallet) {
 		super()
@@ -37,7 +39,7 @@ export class MempoolExecutor<
 				)
 		}
 
-		transaction.gasPrice = bidGasPrice
+		transaction.gasPrice = BigNumber.from(bidGasPrice.toString())
 
 		// ! Send the transaction.
 		await this.signer.sendTransaction(transaction)

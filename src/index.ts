@@ -36,9 +36,12 @@ export {
 
 // ! Executors
 export { Executor } from '@/core/executor'
-export { FlashbotsExecutor } from '@/core/executors/flashbots'
-export { LogExecutor } from '@/core/executors/log'
-export { MempoolExecutor } from '@/core/executors/mempool'
+export {
+	FlashbotsExecution,
+	FlashbotsExecutor
+} from '@/core/executors/flashbots'
+export { LogExecution, LogExecutor } from '@/core/executors/log'
+export { MempoolExecution, MempoolExecutor } from '@/core/executors/mempool'
 
 // ! Strategies
 export { Strategy } from '@/core/strategy'

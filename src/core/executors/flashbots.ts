@@ -9,14 +9,16 @@ import { providers, Wallet } from 'ethers'
 import { Executor } from '@/core/executor'
 import { logger } from '@/lib/logger'
 
+export type FlashbotsExecution = {
+	transaction: providers.TransactionRequest
+	config?: Partial<{
+		// ! How many blocks in the future we will allow settlement within.
+		buffer: number
+	}>
+}
+
 export class FlashbotsExecutor<
-	TExecution extends {
-		transaction: providers.TransactionRequest
-		config?: Partial<{
-			// ! How many blocks in the future we will allow settlement within.
-			buffer: number
-		}>
-	}
+	TExecution extends FlashbotsExecution
 > extends Executor<TExecution> {
 	public flashbotsClient: FlashbotsBundleProvider | undefined
 
