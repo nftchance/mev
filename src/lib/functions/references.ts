@@ -1,6 +1,6 @@
 import { useEtherscan } from '../hooks/useEtherscan'
 import { format } from './config'
-import { execShellCommand } from './shell'
+import { shell } from './shell'
 import dedent from 'dedent'
 import { default as fse } from 'fs-extra'
 
@@ -82,7 +82,7 @@ const generateStaticReferences = async ({
 	if (abi) {
 		const filename = key.startsWith('I') ? key : `I${key}`
 
-		const response = await execShellCommand(
+		const response = await shell(
 			`echo '${abi}' | pnpm abi-to-sol ${filename} --solidity-version 0.8.17 --license BUSL-1.1`
 		)
 
@@ -92,6 +92,43 @@ const generateStaticReferences = async ({
 				response
 			)
 	}
+}
+
+const generateDynamicReferences = ({
+	name,
+	source
+}: {
+	name: string
+	source: string | undefined
+}) => {
+	if (!source) return
+
+	// * Remove the double curly braces from the source code.
+	// ! I am not sure why this is happening, but it is solved now.
+	source = source.replace('{{', '{')
+	source = source.replace('}}', '}')
+
+	const contractSources = JSON.parse(source).sources as {
+		[key: string]: { content: string }
+	}
+
+	Object.entries(contractSources).forEach(([sourceKey, value]) => {
+		const directory = `./src/references/${name}/${sourceKey
+			.replace('./', '')
+			.split('/')
+			.slice(0, -1)
+			.join('/')}`
+
+		const filename = sourceKey.replace('./', '').split('/').slice(-1)[0]
+
+		fse.mkdirSync(directory, {
+			recursive: true
+		})
+
+		fse.writeFileSync(`${directory}/${filename}`, value.content)
+
+		logger.info(`Generated ${directory}/${filename}`)
+	})
 }
 
 export const generateReferences = async <
@@ -105,7 +142,6 @@ export const generateReferences = async <
 	}
 
 	// ! Generate the deployed contract references.
-	// if(references.contracts)
 	let responses: Array<{
 		key: string
 		name: string
@@ -125,8 +161,6 @@ export const generateReferences = async <
 						references.etherscan || DEFAULT_ETHERSCAN,
 						address
 					)
-
-					// console.log(key, address, name, source)
 
 					return { key, address, name: key, abi, source }
 				}
@@ -158,19 +192,12 @@ export const generateReferences = async <
 		)
 	)
 
-	// Run 'echo test' in the shell.
-	// exec('echo test', (error, stdout, stderr) => {
-	// 	if (error) {
-	// 		console.log(`error: ${error.message}`)
-	// 		return
-	// 	}
-	// 	if (stderr) {
-	// 		console.log(`stderr: ${stderr}`)
-	// 		return
-	// 	}
-	// 	console.log(`stdout: ${stdout}`)
-	// })
-	// wrap the execution in a promise
+	// ! Generate the dynamic references.
+	// * If `.source` is undefined, then it is a local artifact and the Solidity
+	//   file was already created by the user.
+	responses.forEach(({ name, source }) => {
+		generateDynamicReferences({ name, source })
+	})
 
 	logger.success(`References generated for ${responses.length} contracts.`)
 }
