@@ -37,6 +37,7 @@ export {
 
 // ! Executors
 export { Executor } from '@/core/executor'
+export { DiscordExecution, DiscordExecutor } from '@/core/executors/discord'
 export {
 	FlashbotsExecution,
 	FlashbotsExecutor

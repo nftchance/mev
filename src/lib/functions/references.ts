@@ -32,8 +32,12 @@ const generateStaticReferences = async ({
         import { ${imports} } from 'ethers'
 
         export const ${bigName}_NAME = '${name}' as const
-        export const ${bigName}_ABI = ${abi} as const
     `
+
+	if (abi)
+		protocolGeneration += `\n
+            export const ${bigName}_ABI = ${abi} as const
+        `
 
 	if (bytecode)
 		protocolGeneration += `\n
@@ -47,12 +51,17 @@ const generateStaticReferences = async ({
 
 	if (address !== undefined)
 		protocolGeneration += `\n
-        export const ${bigName}_ADDRESS = '${address}' as const
-        export const ${bigName}_CONTRACT = new Contract(
-            '${address}',
-            ${bigName}_ABI
-        )
-        export const ${bigName}_INTERFACE = ${bigName}_CONTRACT.interface`
+            export const ${bigName}_ADDRESS = '${address}' as const
+        `
+
+	if (address !== undefined && abi !== undefined)
+		protocolGeneration += `\n
+            export const ${bigName}_CONTRACT = new Contract(
+                '${address}',
+                ${bigName}_ABI
+            )
+            export const ${bigName}_INTERFACE = ${bigName}_CONTRACT.interface
+        `
 
 	if (address === undefined && abi !== undefined)
 		protocolGeneration += `

@@ -73,7 +73,7 @@ export class Engine<
 						if (execution === undefined) return
 
 						// * Pass the need for Execution to the Executors.
-						this.stream.emit('Execution', execution)
+						this.stream.emit(execution.key, execution.execution)
 					}
 				)
 			}
