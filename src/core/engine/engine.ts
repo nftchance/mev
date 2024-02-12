@@ -35,6 +35,12 @@ export class Engine<
 
 		const strategiesPromises = Object.entries(this.strategies).map(
 			async ([name, strategy]) => {
+				console.log(`Running: ${name}`)
+
+				// ! If the strategy does not have a processCollection method
+				//  then we don't need to do anything and can move on to the next.
+				if (strategy.processCollection === undefined) return
+
 				// ! Initialize the backfilled state.
 				if (strategy.syncState) await strategy.syncState()
 
