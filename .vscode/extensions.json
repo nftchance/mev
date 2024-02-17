@@ -1,6 +1,6 @@
 {
-	"recommendations": [
-		"orta.vscode-twoslash-queries",
-		"esbenp.prettier-vscode"
-	]
+    "recommendations": [
+        "orta.vscode-twoslash-queries",
+        "esbenp.prettier-vscode"
+    ]
 }

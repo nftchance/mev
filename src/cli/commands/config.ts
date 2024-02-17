@@ -1,16 +1,16 @@
-import { configs } from '@/lib/functions/config'
+import { configs } from "@/lib/functions/config"
 
 export default async function (
-	options: Parameters<typeof configs>[number] = {}
+    options: Parameters<typeof configs>[number] = {},
 ) {
-	for (const config of await configs(options)) {
-		console.table(
-			Object.entries(config).map(([key, value]) => ({
-				key,
-				value
-			}))
-		)
-	}
+    for (const config of await configs(options)) {
+        console.table(
+            Object.entries(config).map(([key, value]) => ({
+                key,
+                value,
+            })),
+        )
+    }
 
-	process.exit()
+    process.exit()
 }

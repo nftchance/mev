@@ -1,20 +1,20 @@
-import { Executor } from '@/core/executor'
-import { logger } from '@/lib/logger'
+import { Executor } from "@/core/executor"
+import { logger } from "@/lib/logger"
 
 export type LogExecution = { message: string }
 
-const key = 'Log' as const
+const key = "Log" as const
 
 export class LogExecutor<
-	TExecution extends LogExecution = LogExecution
+    TExecution extends LogExecution = LogExecution,
 > extends Executor<typeof key, TExecution> {
-	public static key = key
+    public static key = key
 
-	constructor() {
-		super(key)
-	}
+    constructor() {
+        super(key)
+    }
 
-	execute = async ({ message }: TExecution) => {
-		logger.info(message)
-	}
+    execute = async ({ message }: TExecution) => {
+        logger.info(message)
+    }
 }

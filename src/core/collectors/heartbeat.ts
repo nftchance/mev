@@ -1,29 +1,29 @@
-import { EventEmitter } from 'node:events'
+import { EventEmitter } from "node:events"
 
-import { Collector } from '@/core/collector'
+import { Collector } from "@/core/collector"
 
-const key = 'Heartbeat' as const
+const key = "Heartbeat" as const
 
 export type HeartbeatCollection = {
-	nonce: number
+    nonce: number
 }
 
 export class HeartbeatCollector extends Collector<
-	typeof key,
-	HeartbeatCollection
+    typeof key,
+    HeartbeatCollection
 > {
-	public static key = key
-	public nonce = 0
+    public static key = key
+    public nonce = 0
 
-	constructor(public readonly rate: number) {
-		super(key)
-	}
+    constructor(public readonly rate: number) {
+        super(key)
+    }
 
-	getCollectionStream = async (stream: EventEmitter) => {
-		setInterval(() => {
-			this.emit(stream, {
-				nonce: this.nonce++
-			})
-		}, this.rate)
-	}
+    getCollectionStream = async (stream: EventEmitter) => {
+        setInterval(() => {
+            this.emit(stream, {
+                nonce: this.nonce++,
+            })
+        }, this.rate)
+    }
 }

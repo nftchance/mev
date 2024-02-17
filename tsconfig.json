@@ -1,27 +1,27 @@
 {
-	"compilerOptions": {
-		"module": "ESNext",
-		"target": "ESNext",
-		"moduleResolution": "node",
-		"strict": true,
-		"jsx": "preserve",
-		"allowSyntheticDefaultImports": true,
-		"forceConsistentCasingInFileNames": true,
-		"allowImportingTsExtensions": true,
-		"noEmit": true,
-		"allowJs": true,
-		"rootDir": "./src",
-		"outDir": "./dist",
-		"esModuleInterop": true,
-		"sourceMap": true,
-		"declaration": true,
-		"declarationMap": true,
-		"skipLibCheck": true,
-		"baseUrl": ".",
-		"paths": {
-			"@/*": ["src/*"]
-		}
-	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules/", "references/", "dist", "tsup.config.ts"]
+    "compilerOptions": {
+        "module": "ESNext",
+        "target": "ESNext",
+        "moduleResolution": "node",
+        "strict": true,
+        "jsx": "preserve",
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "allowImportingTsExtensions": true,
+        "noEmit": true,
+        "allowJs": true,
+        "rootDir": "./src",
+        "outDir": "./dist",
+        "esModuleInterop": true,
+        "sourceMap": true,
+        "declaration": true,
+        "declarationMap": true,
+        "skipLibCheck": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["src/*"]
+        }
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules/", "references/", "dist", "tsup.config.ts"]
 }

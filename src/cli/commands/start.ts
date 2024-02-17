@@ -1,41 +1,41 @@
-import pc from 'picocolors'
+import pc from "picocolors"
 
-import { Engine } from '@/core/engine/engine'
-import { configs } from '@/lib/functions/config'
-import { getStrategy } from '@/lib/functions/strategies'
-import { logger } from '@/lib/logger'
+import { Engine } from "@/core/engine/engine"
+import { configs } from "@/lib/functions/config"
+import { getStrategy } from "@/lib/functions/strategies"
+import { logger } from "@/lib/logger"
 
 type Props = Partial<{
-	strategy: string
+    strategy: string
 }> &
-	Parameters<typeof configs>[0]
+    Parameters<typeof configs>[0]
 
 export default async function (options: Props = {}) {
-	const { strategy: strategyName } = options
+    const { strategy: strategyName } = options
 
-	let ran = false
+    let ran = false
 
-	for (const config of await configs(options)) {
-		let strategies: Record<string, any> = config.strategies
+    for (const config of await configs(options)) {
+        let strategies: Record<string, any> = config.strategies
 
-		if (strategyName) {
-			const strategy = getStrategy<typeof config.strategies>(
-				config.strategies,
-				strategyName
-			)
+        if (strategyName) {
+            const strategy = getStrategy<typeof config.strategies>(
+                config.strategies,
+                strategyName,
+            )
 
-			if (strategy === undefined) {
-				logger.warn(`Strategy '${pc.gray(strategyName)}' not found.`)
-				continue
-			}
+            if (strategy === undefined) {
+                logger.warn(`Strategy '${pc.gray(strategyName)}' not found.`)
+                continue
+            }
 
-			strategies = { [strategyName]: strategy }
-		}
+            strategies = { [strategyName]: strategy }
+        }
 
-		ran = true
+        ran = true
 
-		await new Engine(config, strategies).run()
-	}
+        await new Engine(config, strategies).run()
+    }
 
-	if (!ran) logger.error('No strategies were run.')
+    if (!ran) logger.error("No strategies were run.")
 }
