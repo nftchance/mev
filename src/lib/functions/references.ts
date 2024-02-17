@@ -109,27 +109,31 @@ const generateDynamicReferences = ({
 	source = source.replace('{{', '{')
 	source = source.replace('}}', '}')
 
-	const contractSources = JSON.parse(source).sources as {
-		[key: string]: { content: string }
-	}
+	try {
+		const contractSources = JSON.parse(source).sources as {
+			[key: string]: { content: string }
+		}
 
-	Object.entries(contractSources).forEach(([sourceKey, value]) => {
-		const directory = `./src/references/${name}/${sourceKey
-			.replace('./', '')
-			.split('/')
-			.slice(0, -1)
-			.join('/')}`
+		Object.entries(contractSources).forEach(([sourceKey, value]) => {
+			const directory = `./src/references/${name}/${sourceKey
+				.replace('./', '')
+				.split('/')
+				.slice(0, -1)
+				.join('/')}`
 
-		const filename = sourceKey.replace('./', '').split('/').slice(-1)[0]
+			const filename = sourceKey.replace('./', '').split('/').slice(-1)[0]
 
-		fse.mkdirSync(directory, {
-			recursive: true
+			fse.mkdirSync(directory, {
+				recursive: true
+			})
+
+			fse.writeFileSync(`${directory}/${filename}`, value.content)
+
+			logger.info(`Generated ${directory}/${filename}`)
 		})
-
-		fse.writeFileSync(`${directory}/${filename}`, value.content)
-
-		logger.info(`Generated ${directory}/${filename}`)
-	})
+	} catch (error) {
+		logger.error(`Failed to parse the source code for ${name}.`)
+	}
 }
 
 export const generateReferences = async <

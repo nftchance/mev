@@ -6,6 +6,13 @@ import { defineConfig } from '@/core/engine/config'
 async function getJsonFilesInDirectory(directory: string) {
 	let jsonFiles: Array<string> = []
 
+	// Ensure the directory exists
+	const exists = await fse.pathExists(directory)
+
+	if (!exists) {
+		return jsonFiles
+	}
+
 	// Read the directory content
 	const filesAndDirs = await fse.readdir(directory)
 
@@ -62,7 +69,7 @@ export async function getArtifacts(
 					name,
 					abi: JSON.stringify(abi),
 					bytecode,
-                    deployedBytecode
+					deployedBytecode
 				}
 			})
 	)
