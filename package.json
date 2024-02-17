@@ -1,0 +1,54 @@
+{
+	"name": "@nftchance/mev",
+	"author": "nftchance",
+	"license": "BUSL-1.1",
+	"version": "0.0.0",
+	"description": "The controlling property of an aggressive long-tail mev bot.",
+	"type": "module",
+	"main": "dist/index.js",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"bin": {
+		"mev": "dist/cli/cli.js"
+	},
+	"files": ["src", "dist"],
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "tsup",
+		"lint": "tsc --noEmit",
+		"premev": "pnpm build",
+		"mev": "node dist/cli/cli.js",
+		"prereferences": "pnpm build",
+		"references": "node dist/lib/references.js",
+		"preinstall": "npx only-allow pnpm"
+	},
+	"devDependencies": {
+		"@trivago/prettier-plugin-sort-imports": "^4.2.0",
+		"@types/cli-progress": "^3.11.3",
+		"@types/fs-extra": "^11.0.2",
+		"@types/js-yaml": "^4.0.7",
+		"@types/node": "^20.8.4",
+		"abi-to-sol": "^0.8.0",
+		"execa": "^8.0.1",
+		"prettier": "^3.0.3",
+		"typescript": "^5.2.2"
+	},
+	"dependencies": {
+		"@flashbots/ethers-provider-bundle": "^0.6.2",
+		"@opensea/stream-js": "^0.1.2",
+		"axios": "^1.5.1",
+		"bundle-require": "^4.0.2",
+		"commander": "^11.0.0",
+		"dedent": "^1.5.1",
+		"dotenv": "^16.3.1",
+		"ethers": "^5.7.2",
+		"find-up": "^6.3.0",
+		"fs-extra": "^11.1.1",
+		"opensea-js": "^6.1.11",
+		"pathe": "^1.1.1",
+		"picocolors": "^1.0.0",
+		"tsup": "^7.2.0"
+	}
+}
