@@ -1,11 +1,17 @@
-# MEV Bot
+# 🥵 MEV
 
-This repository contains the MEV bot that has been evolved throughout the years. This is a culmination of the strategies that I have been able to reverse engineer from previous actors.
+This repository contains a Typescript-based "process-parallel" MEV bot that has been evolved throughout the years. What this means, is that instead of creating new scripts and collectors for each of your strategies you can simply reuse the streams of data that already exist. Instead of needing a new `block` collector for every single strategy you run within the EVM ecosystem you can simply reuse a constant feed from one RPC endpoint. By doing this your RPC interactions remain far more managable and you are less limited by scale and throughput.
 
-> Note:
-> In several places in this repository the supply of additional data is required than is simply needed. This is done to prevent loss of funds and maintain safe procedures as the highest priority. No amount of returns can offset the unexpectedly massive loss.
+Inspired by [Artemis](https://github.com/paradigmxyz/artemis) developed by Paradigm the key pieces of this engine can be broken down into:
+
+-   Collectors: Streams of data that consume and forward onchain and offchain events/triggers.
+-   Executors: Actions taken when an event is received such as logging, discord message forwarding, mempool entry / general transaction execution.
+-   Strategies: Created by combining Collectors and Executors a Strategy coordinates the request and response from each piece of the consumer.
 
 ## Getting Started
+
+> [!NOTE]
+> When using the bot you will want to create a playground that contains all the individual pieces of your strategies, this repository contains the core engine that is needed to get you up and running. There are no default strategies included at this time. However, you can see an example of implementation at `src/core/strategies/block.log.ts`.
 
 To get started, we will use `pnpm` to install the dependencies and run the bot.
 
@@ -27,4 +33,69 @@ With a passing test suite, you are cleared to enable the bot and let it run. Wit
 
 ```bash
 pnpm mev start
+```
+
+As your strategies become more complex you will need local interfaces to the contracts that you interact with. To do so, simply run:
+
+```bash
+pnpm mev references
+```
+
+To see the active state of your configuration and confirm that everything is properly setup you can run:
+
+```bash
+pnpm mev config
+```
+
+## Your Configuration
+
+As you create and utilize strategies your bot will be managed through a single configuration file. A copy-pasta ready starting point is as follows:
+
+```typescript
+import {
+    BlockCollector,
+    defineConfig,
+    DiscordExecutor,
+    LogExecutor,
+    MempoolExecutor,
+} from "@nftchance/mev"
+import { providers, Wallet } from "ethers"
+import { z } from "zod"
+
+const envSchema = z.object({
+    ETHERSCAN_API_KEY: z.string(),
+    RPC_URL: z.string(),
+    PRIVATE_KEY: z.string(),
+    DISCORD_SNIPER_WEBHOOK_URL: z.string(),
+})
+
+const env = envSchema.parse(process.env)
+
+const client = new providers.WebSocketProvider(env.RPC_URL)
+const privateKeyPrefix = env.PRIVATE_KEY.startsWith("0x") ? "" : "0x"
+const signer = new Wallet(privateKeyPrefix + env.PRIVATE_KEY, client)
+
+const blockCollector = new BlockCollector(client)
+
+const logExecutor = new LogExecutor()
+const mempoolExecutor = new MempoolExecutor(signer)
+const discordExecutor = new DiscordExecutor()
+
+export default defineConfig({
+    references: {
+        artifacts: "./src/artifacts",
+        etherscan: (address: string) =>
+            `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apiKey=${env.ETHERSCAN_API_KEY}`,
+        bytecode: async (address: string) =>
+            await client.getCode(address, "latest"),
+        contracts: {
+            // ! Uniswap
+            UniswapV2Factory: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
+            UniswapV3Factory: "0x1F98431c8aD98523631AE4a59f267346ea31F984",
+        },
+    },
+    collectors: [blockCollector],
+    executors: [discordExecutor, logExecutor, mempoolExecutor],
+    strategies: {},
+})
 ```
