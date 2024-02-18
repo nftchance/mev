@@ -11,7 +11,7 @@ export default async function init(
         config: string
         root: string
         content: any
-    }>,
+    }>
 ) {
     const configPath = await find({
         config: options.config,
@@ -20,7 +20,7 @@ export default async function init(
 
     if (configPath) {
         logger.info(
-            `* Found configuration file at: \n\t ${pc.gray(configPath)}`,
+            `* Found configuration file at: \n\t ${pc.gray(configPath)}`
         )
 
         return
@@ -35,24 +35,18 @@ export default async function init(
     } else {
         outPath = resolve(
             rootDir,
-            `${name}.config.${isUsingTypescript ? "ts" : "js"}`,
+            `${name}.config.${isUsingTypescript ? "ts" : "js"}`
         )
     }
 
     let content: string
-    if (isUsingTypescript) {
-        const config = options.content ?? {}
+    const config = options.content ?? {}
 
-        content = dedent(`
+    content = dedent(`
             import { defineConfig } from "@nftchance/mev"
 
             export default defineConfig(${JSON.stringify(config)})
         `)
-    } else {
-        content = dedent(`
-            // TODO: This is not yet supported.
-        `)
-    }
 
     // ! Run prettier so that we format out the stringified JSON.
     const formatted = await format(content)
