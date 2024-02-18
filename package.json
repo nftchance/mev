@@ -1,9 +1,9 @@
 {
     "name": "@nftchance/mev",
     "author": "nftchance",
-    "license": "BUSL-1.1",
+    "license": "MIT",
     "version": "0.0.0",
-    "description": "The controlling property of an aggressive long-tail mev bot.",
+    "description": "A MEV bot engine designed specifically for individuals that need high data stream throughput paired with the ability to craft new strategies in as few lines of code possible.",
     "type": "module",
     "main": "dist/index.js",
     "module": "dist/index.js",
@@ -11,10 +11,7 @@
     "bin": {
         "mev": "dist/cli/cli.js"
     },
-    "files": [
-        "src",
-        "dist"
-    ],
+    "files": ["src", "dist"],
     "publishConfig": {
         "access": "public"
     },
@@ -25,7 +22,10 @@
         "mev": "node dist/cli/cli.js",
         "prereferences": "pnpm build",
         "references": "node dist/lib/references.js",
-        "preinstall": "npx only-allow pnpm"
+        "preinstall": "npx only-allow pnpm",
+        "ci:release": "pnpm publish -r",
+        "ci:version": "changeset version",
+        "ci:publish": "changeset publish"
     },
     "devDependencies": {
         "@trivago/prettier-plugin-sort-imports": "^4.2.0",
