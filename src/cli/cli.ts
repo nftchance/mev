@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { Command } from "commander"
 
 import config from "@/cli/commands/config"
