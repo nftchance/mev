@@ -5,8 +5,8 @@ This repository contains a Typescript-based "process-parallel" MEV bot that has 
 Inspired by [Artemis](https://github.com/paradigmxyz/artemis), the key pieces of this engine can be broken down into:
 
 -   Collectors: Streams of data that consume and forward onchain and offchain events/triggers.
--   Executors: Actions taken when an event is received such as logging, discord message forwarding, mempool entry / general transaction execution.
--   Strategies: Created by combining Collectors and Executors a Strategy coordinates the request and response from each piece of the consumer.
+-   Executors: Actions taken when an event is received.
+-   Strategies: Organization of Collectors and Executors to form a single-lane outcome.
 
 ## Getting Started
 
