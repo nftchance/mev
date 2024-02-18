@@ -11,7 +11,10 @@
     "bin": {
         "mev": "dist/cli/cli.js"
     },
-    "files": ["src", "dist"],
+    "files": [
+        "src",
+        "dist"
+    ],
     "publishConfig": {
         "access": "public"
     },
@@ -39,6 +42,7 @@
         "typescript": "^5.2.2"
     },
     "dependencies": {
+        "@changesets/cli": "^2.27.1",
         "@flashbots/ethers-provider-bundle": "^0.6.2",
         "@opensea/stream-js": "^0.1.2",
         "axios": "^1.5.1",
