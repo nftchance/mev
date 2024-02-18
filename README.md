@@ -2,7 +2,7 @@
 
 This repository contains a Typescript-based "process-parallel" MEV bot that has been evolved throughout the years. What this means, is that instead of creating new scripts and collectors for each of your strategies you can simply reuse the streams of data that already exist. Instead of needing a new `block` collector for every single strategy you run within the EVM ecosystem you can simply reuse a constant feed from one RPC endpoint. By doing this your RPC interactions remain far more managable and you are less limited by scale and throughput.
 
-Inspired by [Artemis](https://github.com/paradigmxyz/artemis) developed by Paradigm the key pieces of this engine can be broken down into:
+Inspired by [Artemis](https://github.com/paradigmxyz/artemis), a framework developed by Paradigm the key pieces of this engine can be broken down into:
 
 -   Collectors: Streams of data that consume and forward onchain and offchain events/triggers.
 -   Executors: Actions taken when an event is received such as logging, discord message forwarding, mempool entry / general transaction execution.
