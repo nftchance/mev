@@ -52,34 +52,18 @@ pnpm mev config
 As you create and utilize strategies your bot will be managed through a single configuration file. A copy-pasta ready starting point is as follows:
 
 ```typescript
-import {
-    BlockCollector,
-    defineConfig,
-    DiscordExecutor,
-    LogExecutor,
-    MempoolExecutor,
-} from "@nftchance/mev"
+import { BlockCollector, defineConfig } from "@nftchance/mev"
 import { providers, Wallet } from "ethers"
 import { z } from "zod"
 
 const envSchema = z.object({
     ETHERSCAN_API_KEY: z.string(),
     RPC_URL: z.string(),
-    PRIVATE_KEY: z.string(),
-    DISCORD_SNIPER_WEBHOOK_URL: z.string(),
 })
 
 const env = envSchema.parse(process.env)
-
 const client = new providers.WebSocketProvider(env.RPC_URL)
-const privateKeyPrefix = env.PRIVATE_KEY.startsWith("0x") ? "" : "0x"
-const signer = new Wallet(privateKeyPrefix + env.PRIVATE_KEY, client)
-
 const blockCollector = new BlockCollector(client)
-
-const logExecutor = new LogExecutor()
-const mempoolExecutor = new MempoolExecutor(signer)
-const discordExecutor = new DiscordExecutor()
 
 export default defineConfig({
     references: {
@@ -95,7 +79,7 @@ export default defineConfig({
         },
     },
     collectors: [blockCollector],
-    executors: [discordExecutor, logExecutor, mempoolExecutor],
+    executors: [],
     strategies: {},
 })
 ```
