@@ -21,7 +21,7 @@ export default async function (options: Props = {}) {
         if (strategyName) {
             const strategy = getStrategy<typeof config.strategies>(
                 config.strategies,
-                strategyName,
+                strategyName
             )
 
             if (strategy === undefined) {
