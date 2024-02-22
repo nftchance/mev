@@ -6,7 +6,7 @@ import { exec, execSync } from "child_process"
 describe("command line interface", () => {
     let tempDir: string
 
-    let cliPath = path.join(__dirname, "..", "..", "dist", "cli", "cli.js")
+    let cliPath = path.join(__dirname, "..", "dist", "cli", "cli.js")
     let cli = `node ${cliPath}`
 
     beforeEach(() => {
