@@ -9,8 +9,10 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
-            - uses: pnpm/action-setup@v2
+            - name: 🛒 Checkout
+              uses: actions/checkout@v3
+
+            - uses: 📐 pnpm/action-setup@v2
               with:
                   version: 8
 
@@ -29,6 +31,11 @@ jobs:
             - name: 🏗️ Build
               run: pnpm build
 
+            - name: 📤 Upload Build Artifacts
+              uses: actions/upload-artifact@v2
+              with:
+                  name: build-artifacts
+                  path: dist/
     test:
         needs: build
         runs-on: ${{ matrix.os }}
@@ -37,12 +44,20 @@ jobs:
                 os: [ubuntu-latest, windows-latest, macos-latest]
                 node-version: [18]
         steps:
-            - uses: actions/checkout@v3
-            - uses: pnpm/action-setup@v2
+            - name: 📥 Download Build Artifacts
+              uses: actions/download-artifact@v2
+              with:
+                  name: build-artifacts
+                  path: path/to/your/build/directory
+
+            - name: 🛒 Checkout
+              uses: actions/checkout@v3
+
+            - uses: 📐 pnpm/action-setup@v2
               with:
                   version: 8
 
-            - name: Setup Node ${{ matrix.node-version }}
+            - name: 🏗️ Setup Node ${{ matrix.node-version }}
               uses: actions/setup-node@v3
               with:
                   node-version: ${{ matrix.node-version }}
@@ -50,9 +65,6 @@ jobs:
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
-
-            - name: 🏗️ Build
-              run: pnpm build
 
             - name: 🧪 Test
               run: pnpm test
