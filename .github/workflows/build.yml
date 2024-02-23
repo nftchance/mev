@@ -36,8 +36,6 @@ jobs:
             matrix:
                 os: [ubuntu-latest, windows-latest, macos-latest]
                 node-version: [18]
-            concurrency:
-                group: ${{ github.workflow }}-test-${{ github.run_id }}
         steps:
             - uses: actions/checkout@v3
             - uses: pnpm/action-setup@v2
