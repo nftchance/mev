@@ -14,7 +14,7 @@ describe("command line interface", () => {
     })
 
     afterEach(() => {
-        fs.rmSync(tempDir, { recursive: true })
+        fs.rmdirSync(tempDir, { recursive: true })
     })
 
     it("--help", () => {
