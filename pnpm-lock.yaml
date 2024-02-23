@@ -28,7 +28,7 @@ dependencies:
     version: 1.5.1
   dotenv:
     specifier: ^16.3.1
-    version: 16.3.1
+    version: 16.4.5
   ethers:
     specifier: ^5.7.2
     version: 5.7.2
@@ -40,7 +40,7 @@ dependencies:
     version: 7.0.0
   fs-extra:
     specifier: ^11.1.1
-    version: 11.1.1
+    version: 11.2.0
   opensea-js:
     specifier: ^6.1.11
     version: 6.1.11
@@ -75,7 +75,7 @@ devDependencies:
     version: 3.11.3
   '@types/fs-extra':
     specifier: ^11.0.2
-    version: 11.0.2
+    version: 11.0.4
   '@types/jest':
     specifier: ^29.5.12
     version: 29.5.12
@@ -2896,8 +2896,8 @@ packages:
       '@types/node': 20.8.4
     dev: true
 
-  /@types/fs-extra@11.0.2:
-    resolution: {integrity: sha512-c0hrgAOVYr21EX8J0jBMXGLMgJqVf/v6yxi0dLaJboW9aQPh16Id+z6w2Tx1hm+piJOLv8xPfVKZCLfjPw/IMQ==}
+  /@types/fs-extra@11.0.4:
+    resolution: {integrity: sha512-yTbItCNreRooED33qjunPthRcSjERP1r4MqCZc7wv0u2sUkzTFp45tgUfS5+r7FrZPdmCCNflLhVSP/o+SemsQ==}
     dependencies:
       '@types/jsonfile': 6.1.2
       '@types/node': 20.8.4
@@ -3618,8 +3618,8 @@ packages:
       path-type: 4.0.0
     dev: false
 
-  /dotenv@16.3.1:
-    resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
+  /dotenv@16.4.5:
+    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
     dev: false
 
@@ -4038,8 +4038,8 @@ packages:
       mime-types: 2.1.35
     dev: false
 
-  /fs-extra@11.1.1:
-    resolution: {integrity: sha512-MGIE4HOvQCeUCzmlHs0vXpih4ysz4wg9qiSAu6cd42lVwPbTM1TjV7RusoyQqMmk/95gdQZX72u+YW+c3eEpFQ==}
+  /fs-extra@11.2.0:
+    resolution: {integrity: sha512-PmDi3uwK5nFuXh7XDTlVnS17xJS7vW36is2+w3xcv8SVxiB4NyATf4ctkVY5bkSjX0Y4nbvZCq1/EjtEyr9ktw==}
     engines: {node: '>=14.14'}
     dependencies:
       graceful-fs: 4.2.11
