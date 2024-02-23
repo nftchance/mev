@@ -187,9 +187,9 @@ const generateDynamicReferences = ({
             logger.info(`Generated ${directory}/${filename}`)
         })
     } catch (error: any) {
-        console.log(source)
-        logger.error(error.toString())
-        logger.error(`Failed to parse the source code for ${name}.`)
+        logger.error(
+            `Failed to parse the source code for ${name}: ${error.toString()}`
+        )
     }
 }
 
