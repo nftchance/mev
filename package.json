@@ -22,7 +22,7 @@
         "mev": "node dist/cli/cli.js",
         "prereferences": "npx build",
         "references": "node dist/lib/references.js",
-        "test": "jest --watchAll=false",
+        "test": "jest --watchAll=false --detectOpenHandles",
         "ci:release": "pnpm publish -r",
         "ci:version": "changeset version",
         "ci:publish": "changeset publish"
