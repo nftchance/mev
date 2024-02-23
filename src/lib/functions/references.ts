@@ -80,19 +80,19 @@ const generateStaticReferences = async ({
 
     logger.info(`Generated ./src/references/${key}/index.ts`)
 
-    if (abi) {
-        const filename = key.startsWith("I") ? key : `I${key}`
-
-        const response = await shell(
-            `echo '${abi}' | npx abi-to-sol ${filename} --solidity-version 0.8.17 --license BUSL-1.1`
-        )
-
-        if (typeof response === "string")
-            fse.writeFileSync(
-                `./src/references/${key}/${filename}.sol`,
-                response
-            )
-    }
+    // if (abi) {
+    //     const filename = key.startsWith("I") ? key : `I${key}`
+    //
+    //     const response = await shell(
+    //         `echo ${abi} | npx abi-to-sol ${filename} --solidity-version 0.8.17 --license BUSL-1.1`
+    //     )
+    //
+    //     if (typeof response === "string")
+    //         fse.writeFileSync(
+    //             `./src/references/${key}/${filename}.sol`,
+    //             response
+    //         )
+    // }
 }
 
 const generateDynamicReferences = ({
@@ -100,10 +100,8 @@ const generateDynamicReferences = ({
     source,
 }: {
     name: string
-    source: string | undefined
+    source: string
 }) => {
-    if (!source) return
-
     // * Remove the double curly braces from the source code.
     // ! I am not sure why this is happening, but it is solved now.
     source = source.replace("{{", "{")
@@ -162,7 +160,7 @@ export const generateReferences = async <
         await Promise.all(
             Object.entries(references.contracts || []).map(
                 async ([key, address]) => {
-                    const { abi, name, source } = await useEtherscan(
+                    const { abi, source } = await useEtherscan(
                         references.etherscan || DEFAULT_ETHERSCAN,
                         address
                     )
@@ -201,6 +199,8 @@ export const generateReferences = async <
     // * If `.source` is undefined, then it is a local artifact and the Solidity
     //   file was already created by the user.
     responses.forEach(({ name, source }) => {
+        if (source === undefined) return
+
         generateDynamicReferences({ name, source })
     })
 
