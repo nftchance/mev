@@ -36,7 +36,6 @@ jobs:
               uses: actions/upload-artifact@v2
               with:
                   name: build-artifacts
-                  path: dist/
     test:
         needs: build
         runs-on: ${{ matrix.os }}
@@ -49,10 +48,6 @@ jobs:
               uses: actions/download-artifact@v2
               with:
                   name: build-artifacts
-                  path: ./
-
-            - name: Display structure of downloaded files
-              run: ls -R dist/
 
             - name: 🛒 Checkout
               uses: actions/checkout@v3
