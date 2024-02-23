@@ -2,6 +2,7 @@ import * as fs from "fs"
 import * as os from "os"
 import * as path from "pathe"
 import { exec, execSync } from "child_process"
+import treeKill from "tree-kill"
 
 describe("command line interface", () => {
     let tempDir: string
@@ -65,7 +66,22 @@ describe("command line interface", () => {
             output += data
 
             if (output.includes("Running:")) {
-                process.kill()
+                if (process?.pid) {
+                    treeKill(process?.pid, "SIGKILL", (err) => {
+                        if (err) {
+                            console.error("Failed to kill process", err)
+                            done(err)
+                        } else {
+                            expect(output).toContain(
+                                "Engine initialized with 1 collectors, 1 executors, and 1 strategies"
+                            )
+                            expect(output).toContain("Running: block")
+                            done()
+                        }
+                    })
+                } else {
+                    done(new Error("Process not found"))
+                }
             }
         })
 
