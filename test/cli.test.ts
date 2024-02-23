@@ -69,10 +69,6 @@ describe("command line interface", () => {
             }
         })
 
-        process.on("error", (err) => {
-            done(err)
-        })
-
         process.on("exit", () => {
             expect(output).toContain(
                 "Engine initialized with 1 collectors, 1 executors, and 1 strategies"
