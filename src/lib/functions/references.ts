@@ -1,6 +1,5 @@
 import { useEtherscan } from "../hooks/useEtherscan"
 import { format } from "./config"
-import { shell } from "./shell"
 import { default as fse } from "fs-extra"
 
 import { defineConfig } from "@/core/engine/config"
@@ -8,6 +7,8 @@ import { DEFAULT_ETHERSCAN } from "@/core/engine/constants"
 import { getArtifacts } from "@/lib/functions/artifacts"
 import { logger } from "@/lib/logger"
 
+// * Generate the static Typescript references for the contracts declared.
+// ? If the reference was already generated, then we will skip it.
 const generateStaticReferences = async ({
     key,
     name,
@@ -23,6 +24,18 @@ const generateStaticReferences = async ({
     bytecode?: string
     deployedBytecode?: string
 }) => {
+    if (!fse.existsSync(`./src/references/${key}`))
+        fse.mkdirSync(`./src/references/${key}`, {
+            recursive: true,
+        })
+
+    const file = `./src/references/${key}/index.ts`
+
+    if (fse.existsSync(file)) {
+        logger.info(`Reference for ${name} already exists.`)
+        return
+    }
+
     const bigName = name.replace(" ", "_").toUpperCase()
 
     const imports = [address === undefined ? "utils" : "Contract"]
@@ -69,14 +82,9 @@ const generateStaticReferences = async ({
             ${bigName}_ABI
         )`
 
-    if (!fse.existsSync(`./src/references/${key}`))
-        fse.mkdirSync(`./src/references/${key}`, {
-            recursive: true,
-        })
-
     const formatted = await format(protocolGeneration)
 
-    fse.writeFileSync(`./src/references/${key}/index.ts`, formatted)
+    fse.writeFileSync(file, formatted)
 
     logger.info(`Generated ./src/references/${key}/index.ts`)
 
@@ -95,14 +103,35 @@ const generateDynamicReferences = ({
     name: string
     source: string
 }) => {
+    if (fse.existsSync(`./src/references/${name}/contracts`)) {
+        logger.info(
+            `Reference implementation contracts for ${name} already exist.`
+        )
+        return
+    }
+
     // * Remove the double curly braces from the source code.
     // ! I am not sure why this is happening, but it is solved now.
     source = source.replace("{{", "{")
     source = source.replace("}}", "}")
 
     try {
-        const contractSources = JSON.parse(source).sources as {
+        let contractSources: {
             [key: string]: { content: string }
+        } = {}
+
+        /// * This handles the case where the source code is a JSON object
+        ///   because the contract was verified with a collection of resources.
+        if (source.startsWith("{") && source.endsWith("}")) {
+            contractSources = JSON.parse(source).sources
+        }
+        /// * This is for when the contract was flattened and the source code is
+        ///   a single string reference. Often done for older contracts.
+        else {
+            const fileName = `contracts/${name}.sol`
+            contractSources = {
+                [fileName]: { content: source },
+            }
         }
 
         Object.entries(contractSources).forEach(([sourceKey, value]) => {
@@ -122,7 +151,9 @@ const generateDynamicReferences = ({
 
             logger.info(`Generated ${directory}/${filename}`)
         })
-    } catch (error) {
+    } catch (error: any) {
+        console.log(source)
+        logger.error(error.toString())
         logger.error(`Failed to parse the source code for ${name}.`)
     }
 }
