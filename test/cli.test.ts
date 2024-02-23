@@ -10,7 +10,8 @@ describe("command line interface", () => {
     let cli = `node ${cliPath}`
 
     beforeEach(() => {
-        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "cli-test-"))
+        const random = Math.random().toString(36).substring(7)
+        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), `cli-test-${random}-`))
     })
 
     afterEach(() => {
