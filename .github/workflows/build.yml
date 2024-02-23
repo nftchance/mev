@@ -12,7 +12,8 @@ jobs:
             - name: 🛒 Checkout
               uses: actions/checkout@v3
 
-            - uses: 📐 pnpm/action-setup@v2
+            - name: 📐 Action Setup
+              uses: pnpm/action-setup@v2
               with:
                   version: 8
 
@@ -48,12 +49,13 @@ jobs:
               uses: actions/download-artifact@v2
               with:
                   name: build-artifacts
-                  path: path/to/your/build/directory
+                  path: dist/
 
             - name: 🛒 Checkout
               uses: actions/checkout@v3
 
-            - uses: 📐 pnpm/action-setup@v2
+            - name: 📐 Action Setup
+              uses: pnpm/action-setup@v2
               with:
                   version: 8
 
