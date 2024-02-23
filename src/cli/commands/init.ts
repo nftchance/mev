@@ -26,7 +26,8 @@ export default async function init(
         return
     }
 
-    const isUsingTypescript = await usingTypescript()
+    // const isUsingTypescript = await usingTypescript()
+    const isUsingTypescript = true
     const rootDir = resolve(options.root || process.cwd())
 
     let outPath: string
@@ -52,5 +53,44 @@ export default async function init(
     const formatted = await format(content)
     await fse.writeFile(outPath, formatted)
 
+    // ! Generate tsconfig.json if needed.
+    if (
+        !fse.existsSync(resolve(rootDir, "tsconfig.json")) &&
+        isUsingTypescript
+    ) {
+        const tsconfig = dedent(`
+            {
+            	"compilerOptions": {
+            		"moduleResolution": "node",
+            		"jsx": "preserve",
+            		"allowSyntheticDefaultImports": true,
+            		"allowImportingTsExtensions": true,
+            		"noEmit": true,
+            		"allowJs": true,
+            		"rootDir": "./",
+            		"outDir": "./dist",
+            		"sourceMap": true,
+            		"declaration": true,
+            		"declarationMap": true,
+            		"baseUrl": ".",
+            		"paths": {
+            			"@/*": ["src/*"]
+            		},
+            		"target": "es2020",
+            		"module": "commonjs",
+            		"esModuleInterop": true,
+            		"forceConsistentCasingInFileNames": true,
+            		"strict": true,
+            		"skipLibCheck": true
+            	},
+            	"exclude": ["src/references"]
+            }
+        `)
+
+        await fse.writeFile(resolve(rootDir, "tsconfig.json"), tsconfig)
+    }
+
     logger.info(`✔︎ Generated configuration file at: \n\t ${pc.gray(outPath)}`)
+
+    process.exit()
 }

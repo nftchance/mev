@@ -1,4 +1,5 @@
-name: "🤖 CI"
+name: "🏗️ Build"
+
 on:
     push:
         branches:
@@ -8,12 +9,16 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
-            - uses: pnpm/action-setup@v2
+            - name: 🛒 Checkout
+              uses: actions/checkout@v4
+
+            - name: 📐 Action Setup
+              uses: pnpm/action-setup@v3
               with:
                   version: 8
+
             - name: 🏗️ Setup Node 18
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v4
               with:
                   node-version: 18
                   cache: "pnpm"
@@ -21,5 +26,38 @@ jobs:
             - name: 📦 Install dependencies
               run: pnpm install --frozen-lockfile
 
-            - name: 🧪 Lint and Build
-              run: pnpm lint && pnpm build
+            - name: 👁️ Lint
+              run: pnpm lint
+
+            - name: 🏗️ Build
+              run: pnpm build
+    test:
+        needs: build
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [ubuntu-latest, windows-latest, macos-latest]
+                node-version: [18]
+        steps:
+            - name: 🛒 Checkout
+              uses: actions/checkout@v4
+
+            - name: 📐 Action Setup
+              uses: pnpm/action-setup@v3
+              with:
+                  version: 8
+
+            - name: 🏗️ Setup Node ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "pnpm"
+
+            - name: 📦 Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: 🏗️ Build
+              run: pnpm build
+
+            - name: 🧪 Test
+              run: pnpm test

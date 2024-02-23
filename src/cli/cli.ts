@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 import { Command } from "commander"
 
 import config from "@/cli/commands/config"
@@ -9,14 +8,6 @@ import start from "@/cli/commands/start"
 import strategies from "@/cli/commands/strategies"
 
 const program = new Command()
-
-// TODO: There is a bug with open references that appears to be originating from
-//       `config()` that results in having to exit the process at the end of the
-//       command otherwise it will just hang and remain open for an extended
-//       period of time. All references are released when the process exits though,
-//       so nothing to really worry about for now.
-// ! Note that we need to remove it on start() so that it keeps running
-//   from the awaits lol.
 
 program
     .name("mev")
