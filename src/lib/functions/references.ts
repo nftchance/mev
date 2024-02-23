@@ -80,19 +80,12 @@ const generateStaticReferences = async ({
 
     logger.info(`Generated ./src/references/${key}/index.ts`)
 
-    // if (abi) {
-    //     const filename = key.startsWith("I") ? key : `I${key}`
-    //
-    //     const response = await shell(
-    //         `echo ${abi} | npx abi-to-sol ${filename} --solidity-version 0.8.17 --license BUSL-1.1`
-    //     )
-    //
-    //     if (typeof response === "string")
-    //         fse.writeFileSync(
-    //             `./src/references/${key}/${filename}.sol`,
-    //             response
-    //         )
-    // }
+    // TODO: Used to the Solidity files were generated here using the ABI however due to
+    //       continued issues and lack of support for contracts that are on versions earlier
+    //       than 5.0 it results in a lot of issues. This will be revisted in the future.
+    // NOTE: When you come back to this, probably easiest and best to directly retrieve
+    //       the source code from Etherscan and then generate the Solidity file from that.
+    //       I am honestly not sure why I didn't just do that originally.
 }
 
 const generateDynamicReferences = ({

@@ -11,10 +11,7 @@
     "bin": {
         "mev": "dist/cli/cli.js"
     },
-    "files": [
-        "src",
-        "dist"
-    ],
+    "files": ["src", "dist"],
     "publishConfig": {
         "access": "public"
     },
@@ -45,7 +42,6 @@
         "@changesets/cli": "^2.27.1",
         "@flashbots/ethers-provider-bundle": "^0.6.2",
         "@opensea/stream-js": "^0.1.2",
-        "abi-to-sol": "^0.8.0",
         "axios": "^1.5.1",
         "bundle-require": "^4.0.2",
         "commander": "^11.0.0",
