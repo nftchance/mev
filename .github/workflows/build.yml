@@ -18,7 +18,7 @@ jobs:
                   version: 8
 
             - name: 🏗️ Setup Node 18
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v3
               with:
                   node-version: 18
                   cache: "pnpm"
@@ -43,7 +43,7 @@ jobs:
               uses: actions/checkout@v4
 
             - name: 📐 Action Setup
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v3
               with:
                   version: 8
 
