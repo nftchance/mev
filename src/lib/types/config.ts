@@ -4,13 +4,7 @@ import { Executor } from "@/core/executor"
 
 export type Artifacts = string
 
-export type References = Partial<{
-    contracts: Record<string, `0x${string}`>
-    bytecode?: (
-        address: string,
-        block: number | "latest" | "pending"
-    ) => Promise<string>
-}>
+export type References = Record<string, `0x${string}`>
 
 export type Collectors = Array<Collector<any, any>>
 export type Executors = Array<Executor<any, any>>
