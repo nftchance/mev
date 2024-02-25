@@ -186,13 +186,6 @@ const generateDynamicReference = (reference: DynamicReference) => {
 }
 
 export const generateReferences = async (network: Network) => {
-    if (
-        network.references === undefined ||
-        network.references.contracts === undefined
-    ) {
-        return
-    }
-
     let references: References = []
     references = references
         .concat(await getSources(network))

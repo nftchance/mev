@@ -2,8 +2,6 @@ import { Network } from "../types/config"
 import { default as fse } from "fs-extra"
 import path from "pathe"
 
-import { defineConfig } from "@/core/engine/config"
-
 async function getJsonFilesInDirectory(directory: string) {
     let jsonFiles: Array<string> = []
 
