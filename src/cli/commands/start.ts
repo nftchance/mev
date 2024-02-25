@@ -37,7 +37,7 @@ export default async function (options: Props = {}) {
     }
 
     if (engines.length === 0) {
-        logger.error("No Strategies or Engines to run.")
+        logger.warn("No Strategies or Engines to run.")
         process.exit()
     }
 
