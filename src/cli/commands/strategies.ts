@@ -5,13 +5,19 @@ export default async function (
     options: Parameters<typeof configs>[number] = {}
 ) {
     for (const config of await configs(options)) {
-        const names = getStrategyNames(config.strategies)
+        for (const networkIndex in config) {
+            const network = config[networkIndex]
 
-        console.table(
-            names.map((name) => ({
-                name,
-            }))
-        )
+            if (network.strategies === undefined) continue
+
+            const names = getStrategyNames(network.strategies)
+
+            console.table(
+                names.map((name) => ({
+                    name,
+                }))
+            )
+        }
     }
 
     process.exit()

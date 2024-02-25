@@ -19,13 +19,13 @@ export type Strategies = Record<string, any>
 export type Network = {
     rpc: `wss://${string}` | `https://${string}`
     etherscan: string
+    collectors: Collectors
+    executors: Executors
+    strategies: Strategies
 } & Partial<{
     etherscanApiKey: string
     artifacts: Artifacts
     references: References
-    collectors: Collectors
-    executors: Executors
-    strategies: Strategies
 }>
 
 export type Config = Record<keyof typeof DEFAULT_NETWORKS, Network>

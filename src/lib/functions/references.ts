@@ -191,6 +191,7 @@ export const generateReferences = async (network: Network) => {
         .concat(await getSources(network))
         .concat(await getArtifacts(network))
 
+    // * Generate all of the reference files.
     await Promise.all(
         references.map(
             async ({
