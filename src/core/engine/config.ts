@@ -1,57 +1,13 @@
 import dotenv from "dotenv"
 
-import { Collector } from "@/core/collector"
-import {
-    DEFAULT_COLLECTORS,
-    DEFAULT_EXECUTORS,
-    DEFAULT_NETWORK,
-    DEFAULT_NETWORKS,
-    DEFAULT_RPC,
-    DEFAULT_STRATEGIES,
-} from "@/core/engine/constants"
-import { Executor } from "@/core/executor"
+import { DEFAULT_NETWORKS } from "@/core/engine/constants"
+import { Config } from "@/lib/types/config"
 
-// * Load dotenv config here so that when a user imports the library
-//   they automatically have access to process.env based on their .env.
 dotenv.config()
 
-export function defineConfig({
-    references = {},
-    defaultNetwork = DEFAULT_NETWORK,
-    networks = DEFAULT_NETWORKS,
-    collectors = DEFAULT_COLLECTORS,
-    executors = DEFAULT_EXECUTORS,
-    strategies = DEFAULT_STRATEGIES,
-}: Partial<{
-    references: Partial<{
-        artifacts: string
-        etherscan: (address: string) => string
-        bytecode: (
-            address: string,
-            block: number | "latest" | "pending",
-        ) => Promise<string>
-        contracts: Record<string, `0x${string}`>
-    }>
-    defaultNetwork: keyof typeof DEFAULT_RPC
-    networks: Record<
-        string,
-        {
-            rpc: `wss://${string}`
-        }
-    >
-    collectors: Array<Collector<any, any>>
-    executors: Array<Executor<any, any>>
-    strategies: Record<string, any>
-}> = {}) {
-    return {
-        references,
-        defaultNetwork,
-        networks,
-        collectors,
-        executors,
-        strategies:
-            collectors === DEFAULT_COLLECTORS && executors === DEFAULT_EXECUTORS
-                ? { ...DEFAULT_STRATEGIES, ...strategies }
-                : strategies,
-    } as const
-}
+/// NOTE: With the newer architecture this function is not really used
+///       for anything, but to prevent the future need for another
+///       major breaking change it remains here and will enable
+///       the ability to manipulate the state of the config object when
+///       needed or when passed to the Engine.
+export const defineConfig = (config: Config = DEFAULT_NETWORKS) => config

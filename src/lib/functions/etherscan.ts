@@ -13,7 +13,7 @@ type EtherscanResponse = {
     source?: string
 }
 
-export const useEtherscan = async (
+export const getSource = async (
     network: Network,
     name: string,
     address: `0x${string}`,
@@ -53,7 +53,7 @@ export const useEtherscan = async (
             await new Promise((resolve) => setTimeout(resolve, 5000))
         }
 
-        return useEtherscan(network, name, address, remainingRetries - 1)
+        return getSource(network, name, address, remainingRetries - 1)
     }
     /// * Request was successful, but the contract source code could not be retrieved.
     else if (
@@ -73,4 +73,22 @@ export const useEtherscan = async (
     const source = result.SourceCode
 
     return { abi, name: contractName, source }
+}
+
+export const getSources = async (network: Network) => {
+    if (
+        network.references === undefined ||
+        network.references.contracts === undefined
+    )
+        return []
+
+    return await Promise.all(
+        Object.entries(network.references.contracts || []).map(
+            async ([name, address]) => {
+                const { abi, source } = await getSource(network, name, address)
+
+                return { name, address, abi, source }
+            }
+        )
+    )
 }
