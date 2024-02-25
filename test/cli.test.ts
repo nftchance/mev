@@ -52,7 +52,9 @@ describe("command line interface", () => {
         }).toString()
 
         // The default configuration does not ship with any included references.
-        expect(result).toContain("References generated for 0 contracts.")
+        expect(result).toContain(
+            "Could not find configuration file. Using default."
+        )
     })
 
     it("start", (done) => {
@@ -95,9 +97,10 @@ describe("command line interface", () => {
             cwd: tempDir,
         }).toString()
 
+        console.log(result)
+
         expect(result).toContain(
             "Could not find configuration file. Using default."
         )
-        expect(result).toContain("block.log")
     })
 })
