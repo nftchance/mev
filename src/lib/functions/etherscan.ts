@@ -83,7 +83,7 @@ export const getSources = async (network: Network) => {
         return []
 
     return await Promise.all(
-        Object.entries(network.references.contracts || []).map(
+        Object.entries(network.references || []).map(
             async ([name, address]) => {
                 const { abi, source } = await getSource(network, name, address)
 
