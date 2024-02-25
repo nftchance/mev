@@ -8,7 +8,7 @@ export default async function (
         for (const networkIndex in config) {
             const network = config[networkIndex]
 
-            if (network.strategies === undefined) continue
+            if (Object.keys(network.strategies).length === 0) continue
 
             const names = getStrategyNames(network.strategies)
 

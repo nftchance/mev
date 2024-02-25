@@ -29,7 +29,7 @@ export default async function (options: Props = {}) {
                 strategies = { [strategyName]: strategy }
             }
 
-            if (strategies === undefined) continue
+            if (Object.keys(network.strategies).length === 0) continue
 
             // * Run the Engine with a specific or all strategies.
             engines.push(new Engine(network, strategies))
