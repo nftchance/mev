@@ -1,9 +1,10 @@
 import { Strategy } from "@/core/strategy"
+import { Strategies } from "@/lib/types/config"
 
 export function getStrategyNames<TStrategies extends Record<string, unknown>>(
     strategies: TStrategies,
     names: Array<string> = [],
-    nameTree: string = "",
+    nameTree: string = ""
 ): Array<string> {
     if (!strategies) return []
 
@@ -28,17 +29,16 @@ export function getStrategyNames<TStrategies extends Record<string, unknown>>(
     return names
 }
 
-export function getStrategy<TStrategies extends Record<string, unknown>>(
-    strategies: TStrategies,
-    name: string,
-) {
+export function getStrategy(strategies: Strategies | undefined, name: string) {
+    if (strategies === undefined) return
+
     const pieces = name.split(".")
 
-    let strategy = strategies as TStrategies
+    let strategy = strategies
     for (const piece of pieces) {
         if (!strategy[piece]) return
 
-        strategy = strategy[piece] as TStrategies
+        strategy = strategy[piece]
     }
 
     if (strategy instanceof Strategy) return strategy

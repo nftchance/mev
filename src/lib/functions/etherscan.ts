@@ -1,6 +1,8 @@
 import { logger } from "../logger"
 import axios from "axios"
 
+import { Network } from "@/lib/types/config"
+
 const escapeResults = ["Contract source code not verified"]
 const terminateResults = ["Invalid API Key"]
 const sleepResults = ["Rate limit"]
@@ -11,15 +13,17 @@ type EtherscanResponse = {
     source?: string
 }
 
-export const useEtherscan = async (
-    url: (address: string) => string,
-    key: string,
+export const getSource = async (
+    network: Network,
+    name: string,
     address: `0x${string}`,
     remainingRetries = 3
 ): Promise<EtherscanResponse> => {
     let contract = { abi: undefined, name: undefined, source: undefined }
 
-    const response = await axios.get(url(address))
+    const url = `${network.etherscan}?module=contract&action=getsourcecode&address=${address}&apiKey=${network.etherscanApiKey}`
+
+    const response = await axios.get(url)
     const message = response.data.message
     let result = response.data.result
 
@@ -32,7 +36,7 @@ export const useEtherscan = async (
                     false
             ) && remainingRetries > 0
 
-        logger.error(`Failed to get source for ${key}: ${result}.`)
+        logger.error(`Failed to get source for ${name}: ${result}.`)
 
         if (!shouldRetry) return contract
 
@@ -49,7 +53,7 @@ export const useEtherscan = async (
             await new Promise((resolve) => setTimeout(resolve, 5000))
         }
 
-        return useEtherscan(url, key, address, remainingRetries - 1)
+        return getSource(network, name, address, remainingRetries - 1)
     }
     /// * Request was successful, but the contract source code could not be retrieved.
     else if (
@@ -57,7 +61,7 @@ export const useEtherscan = async (
             response.data.result[0].ABI.includes(result)
         )
     ) {
-        logger.error(`Source code not verified for ${key}.`)
+        logger.error(`Source code not verified for ${name}.`)
 
         return contract
     }
@@ -65,8 +69,26 @@ export const useEtherscan = async (
     /// * Request was successful, and the contract source code was retrieved.
     result = result[0]
     const abi = result.ABI
-    const name = result.ContractName
+    const contractName = result.ContractName
     const source = result.SourceCode
 
-    return { abi, name, source }
+    return { abi, name: contractName, source }
+}
+
+export const getSources = async (network: Network) => {
+    if (
+        network.references === undefined ||
+        network.references.contracts === undefined
+    )
+        return []
+
+    return await Promise.all(
+        Object.entries(network.references || []).map(
+            async ([name, address]) => {
+                const { abi, source } = await getSource(network, name, address)
+
+                return { name, address, abi, source }
+            }
+        )
+    )
 }

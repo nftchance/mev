@@ -36,23 +36,15 @@ describe("command line interface", () => {
         expect(result).toContain("mev.config.ts")
     })
 
-    it("config", () => {
-        const result = execSync(`${cli} config`, {
-            cwd: tempDir,
-        }).toString()
-
-        expect(result).toContain(
-            "Could not find configuration file. Using default."
-        )
-    })
-
     it("references", () => {
         const result = execSync(`${cli} references`, {
             cwd: tempDir,
         }).toString()
 
         // The default configuration does not ship with any included references.
-        expect(result).toContain("References generated for 0 contracts.")
+        expect(result).toContain(
+            "Could not find configuration file. Using default."
+        )
     })
 
     it("start", (done) => {
@@ -73,9 +65,8 @@ describe("command line interface", () => {
                             done(err)
                         } else {
                             expect(output).toContain(
-                                "Engine initialized with 1 collectors, 1 executors, and 1 strategies"
+                                "No Strategies or Engines to run."
                             )
-                            expect(output).toContain("Running: block")
                             done()
                         }
                     })
@@ -86,10 +77,7 @@ describe("command line interface", () => {
         })
 
         process.on("exit", () => {
-            expect(output).toContain(
-                "Engine initialized with 1 collectors, 1 executors, and 1 strategies"
-            )
-            expect(output).toContain("Running: block")
+            expect(output).toContain("No Strategies or Engines to run.")
             done()
         })
     })
@@ -99,9 +87,10 @@ describe("command line interface", () => {
             cwd: tempDir,
         }).toString()
 
+        console.log(result)
+
         expect(result).toContain(
             "Could not find configuration file. Using default."
         )
-        expect(result).toContain("block.log")
     })
 })

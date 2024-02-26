@@ -1,7 +1,6 @@
+import { Network } from "../types/config"
 import { default as fse } from "fs-extra"
 import path from "pathe"
-
-import { defineConfig } from "@/core/engine/config"
 
 async function getJsonFilesInDirectory(directory: string) {
     let jsonFiles: Array<string> = []
@@ -30,11 +29,13 @@ async function getJsonFilesInDirectory(directory: string) {
     return jsonFiles
 }
 
-export async function getArtifacts(
-    references: ReturnType<typeof defineConfig>["references"]
-) {
+export async function getArtifacts(network: Network) {
+    /// * If there are no artifacts, then return an empty array.
+    if (network.artifacts === undefined || network.artifacts === "") return []
+
+    /// * When there are artifacts, iterate through them and build the bindings.
     return (
-        (await getJsonFilesInDirectory(references.artifacts || "./artifacts"))
+        (await getJsonFilesInDirectory(network.artifacts))
             // * Filter out the non-json files.
             .filter((file) => file.endsWith(".json"))
             // * Read and parse the json files.

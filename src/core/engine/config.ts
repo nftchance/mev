@@ -1,57 +1,57 @@
 import dotenv from "dotenv"
 
-import { Collector } from "@/core/collector"
 import {
-    DEFAULT_COLLECTORS,
-    DEFAULT_EXECUTORS,
-    DEFAULT_NETWORK,
+    DEFAULT_NETWORK_CONFIG,
+    DEFAULT_NETWORK_REFERENCES,
     DEFAULT_NETWORKS,
-    DEFAULT_RPC,
-    DEFAULT_STRATEGIES,
 } from "@/core/engine/constants"
-import { Executor } from "@/core/executor"
+import { logger } from "@/lib/logger"
+import {
+    Config,
+    Network,
+    NetworkBase,
+    NetworkConfig,
+    NetworkReferences,
+} from "@/lib/types/config"
 
-// * Load dotenv config here so that when a user imports the library
-//   they automatically have access to process.env based on their .env.
 dotenv.config()
 
-export function defineConfig({
-    references = {},
-    defaultNetwork = DEFAULT_NETWORK,
-    networks = DEFAULT_NETWORKS,
-    collectors = DEFAULT_COLLECTORS,
-    executors = DEFAULT_EXECUTORS,
-    strategies = DEFAULT_STRATEGIES,
-}: Partial<{
-    references: Partial<{
-        artifacts: string
-        etherscan: (address: string) => string
-        bytecode: (
-            address: string,
-            block: number | "latest" | "pending",
-        ) => Promise<string>
-        contracts: Record<string, `0x${string}`>
-    }>
-    defaultNetwork: keyof typeof DEFAULT_RPC
+export const defineConfig = (
     networks: Record<
-        string,
-        {
-            rpc: `wss://${string}`
-        }
+        keyof typeof DEFAULT_NETWORKS,
+        Partial<NetworkBase & NetworkReferences & NetworkConfig>
     >
-    collectors: Array<Collector<any, any>>
-    executors: Array<Executor<any, any>>
-    strategies: Record<string, any>
-}> = {}) {
-    return {
-        references,
-        defaultNetwork,
-        networks,
-        collectors,
-        executors,
-        strategies:
-            collectors === DEFAULT_COLLECTORS && executors === DEFAULT_EXECUTORS
-                ? { ...DEFAULT_STRATEGIES, ...strategies }
-                : strategies,
-    } as const
+): Config => {
+    const config: Config = {}
+
+    // * While we have a set of default networks, the configuration only
+    //   contains the chains that the user has actually configured.
+    for (const networkId in networks) {
+        const network: Network = {
+            // * Append the default values to the network so that the user
+            //   can operate with the default RPC and Etherscan URLs when
+            //   they are not provided.
+            ...DEFAULT_NETWORKS[networkId],
+            // * Set the default values of the references for the network.
+            // ! Realistically, most implementations of the Engine configuration
+            //   will have at least some amount of contract references, but
+            //   we can't assume that they will be provided at time of loading.
+            ...DEFAULT_NETWORK_REFERENCES,
+            // * Set the operational pieces of the Engine as null
+            //   and then overwrite them with the provided values
+            //   when they are not undefined.
+            ...DEFAULT_NETWORK_CONFIG,
+            // * Finally set all the fields that the user provided in
+            //   their configuration instantiation.
+            ...networks[networkId],
+        }
+
+        config[networkId] = network
+    }
+
+    if (Object.keys(config).length === 0) {
+        logger.warn("No networks were configured.")
+    }
+
+    return config
 }

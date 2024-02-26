@@ -90,7 +90,7 @@ export async function configs(
     options: Partial<{
         config: string
         root: string
-    }> = {},
+    }> = {}
 ): Promise<Array<ReturnType<typeof defineConfig>>> {
     const configPath = await find({
         config: options.config,
@@ -103,7 +103,7 @@ export async function configs(
         const isArrayConfig = Array.isArray(resolvedConfigs)
 
         logger.info(
-            `Using config at index:\n\t${pc.gray(basename(configPath))}`,
+            `Using config at index:\n\t${pc.gray(basename(configPath))}`
         )
 
         return isArrayConfig ? resolvedConfigs : [resolvedConfigs]
@@ -111,5 +111,5 @@ export async function configs(
 
     logger.warn(`Could not find configuration file. Using default.`)
 
-    return [defineConfig()]
+    return [defineConfig({})]
 }
