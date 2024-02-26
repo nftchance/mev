@@ -6,11 +6,22 @@ import {
     DEFAULT_NETWORKS,
 } from "@/core/engine/constants"
 import { logger } from "@/lib/logger"
-import { Config, Network } from "@/lib/types/config"
+import {
+    Config,
+    Network,
+    NetworkBase,
+    NetworkConfig,
+    NetworkReferences,
+} from "@/lib/types/config"
 
 dotenv.config()
 
-export const defineConfig = (networks: Partial<Config>): Config => {
+export const defineConfig = (
+    networks: Record<
+        keyof typeof DEFAULT_NETWORKS,
+        Partial<NetworkBase & NetworkReferences & NetworkConfig>
+    >
+): Config => {
     const config: Config = {}
 
     // * While we have a set of default networks, the configuration only
