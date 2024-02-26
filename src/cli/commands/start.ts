@@ -45,8 +45,5 @@ export default async function (options: Props = {}) {
     //   be long running processes though, so we don't really expect them
     //   all to settle. If they do, that means they've errored out or
     //   completed and so the entire process should exit.
-    Promise.all(engines.map((engine) => engine.run())).then(() => {
-        logger.success("Finished running all Strategies and Engines.")
-        process.exit()
-    })
+    await Promise.all(engines.map((engine) => engine.run()))
 }
