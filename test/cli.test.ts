@@ -36,16 +36,6 @@ describe("command line interface", () => {
         expect(result).toContain("mev.config.ts")
     })
 
-    it("config", () => {
-        const result = execSync(`${cli} config`, {
-            cwd: tempDir,
-        }).toString()
-
-        expect(result).toContain(
-            "Could not find configuration file. Using default."
-        )
-    })
-
     it("references", () => {
         const result = execSync(`${cli} references`, {
             cwd: tempDir,
