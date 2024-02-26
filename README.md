@@ -29,24 +29,18 @@ If you are starting a new bot or do not have a configuration to import, you can 
 pnpm mev init
 ```
 
-By running `mev init` a configuration with a base example has been generated at `mev.config.ts` folder of your project root. Just like that, you are up and running. Of course, if there was no configuration to run a money-making bot that would be awesome, wouldn't it? That is not the case here.
-
-With a passing test suite, you are cleared to enable the bot and let it run. With all the effort leading up to here, just run:
-
-```bash
-pnpm mev start
-```
-
 As your strategies become more complex you will need local interfaces to the contracts that you interact with. To do so, simply run:
 
 ```bash
 pnpm mev references
 ```
 
-To see the active state of your configuration and confirm that everything is properly setup you can run:
+By running `mev init` a configuration with a base example has been generated at `mev.config.ts` folder of your project root. Just like that, you are up and running. Of course, if there was no configuration to run a money-making bot that would be awesome, wouldn't it? That is not the case here.
+
+With a passing test suite, you are cleared to enable the bot and let it run. With all the effort leading up to here, just run:
 
 ```bash
-pnpm mev config
+pnpm mev start
 ```
 
 ## Your Configuration
