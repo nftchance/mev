@@ -8,8 +8,8 @@ export default async function (
     const strategies = []
 
     for (const config of await configs(options)) {
-        for (const networkId in config) {
-            const network = config[networkId]
+        for (const networkId in config.networks) {
+            const network = config.networks[networkId]
 
             if (Object.keys(network.strategies).length === 0) continue
 

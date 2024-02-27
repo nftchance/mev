@@ -9,7 +9,14 @@ import {
     NetworkBase,
     NetworkConfig,
     NetworkReferences,
+    Retries,
 } from "@/lib/types/config"
+
+// * Default retry configuration for the Engine.
+export const DEFAULT_NETWORK_RETRIES: Retries = {
+    retries: 3,
+    delay: 1000,
+}
 
 // * Resource to acquire public RPC node URLs to use as default:
 //   - https://chainlist.org/

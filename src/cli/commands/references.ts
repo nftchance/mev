@@ -7,8 +7,8 @@ export default async function (
     /// * Iterate through all of the configurations that have been provided.
     for (const config of await configs(options)) {
         /// * Iterate through all of the references for each network.
-        for (const networkIndex in config) {
-            const network = config[networkIndex]
+        for (const networkIndex in config.networks) {
+            const network = config.networks[networkIndex]
 
             if (network.references === undefined) return
 
