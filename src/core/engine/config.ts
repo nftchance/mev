@@ -27,7 +27,7 @@ export const defineConfig = (base: BaseConfig): Config => {
 
     // * While we have a set of default networks, the configuration only
     //   contains the chains that the user has actually configured.
-    for (const networkId in base.networks) {
+    for (const networkId in networks) {
         const network: Network = {
             // * Append the default values to the network so that the user
             //   can operate with the default RPC and Etherscan URLs when
@@ -44,7 +44,7 @@ export const defineConfig = (base: BaseConfig): Config => {
             ...DEFAULT_NETWORK_CONFIG,
             // * Finally set all the fields that the user provided in
             //   their configuration instantiation.
-            ...base.networks[networkId],
+            ...networks[networkId],
         }
 
         config.networks[networkId] = network
