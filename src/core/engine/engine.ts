@@ -14,8 +14,8 @@ export class Engine<
     constructor(
         public readonly network: Network,
         public readonly strategies: TStrategies,
-        public readonly stream: EventEmitter = new EventEmitter(),
-        public retry: number = 3,
+        public readonly stream: EventEmitter,
+        public retries: number = 3,
         public delay = 1000
     ) {
         logger.info(
@@ -32,7 +32,7 @@ export class Engine<
             }`
         )
 
-        if (this.retry === 0) {
+        if (this.retries === 0) {
             logger.error("Engine has no more retries left. Exiting process.")
 
             return
@@ -40,11 +40,11 @@ export class Engine<
 
         logger.warn(
             `Engine will retry in ${this.delay / 1000} seconds: ${
-                this.retry
+                this.retries
             } attempts left.`
         )
 
-        this.retry -= 1
+        this.retries -= 1
 
         // * Run the Strategy again.
         setTimeout(async () => await this.run(), this.delay)

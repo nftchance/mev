@@ -111,5 +111,5 @@ export async function configs(
 
     logger.warn(`Could not find configuration file. Using default.`)
 
-    return [defineConfig({})]
+    return [defineConfig({ networks: {} })]
 }

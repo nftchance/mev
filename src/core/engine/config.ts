@@ -3,30 +3,31 @@ import dotenv from "dotenv"
 import {
     DEFAULT_NETWORK_CONFIG,
     DEFAULT_NETWORK_REFERENCES,
+    DEFAULT_NETWORK_RETRIES,
     DEFAULT_NETWORKS,
 } from "@/core/engine/constants"
 import { logger } from "@/lib/logger"
-import {
-    Config,
-    Network,
-    NetworkBase,
-    NetworkConfig,
-    NetworkReferences,
-} from "@/lib/types/config"
+import { BaseConfig, Config, Network } from "@/lib/types/config"
 
 dotenv.config()
 
-export const defineConfig = (
-    networks: Record<
-        keyof typeof DEFAULT_NETWORKS,
-        Partial<NetworkBase & NetworkReferences & NetworkConfig>
-    >
-): Config => {
-    const config: Config = {}
+export const defineConfig = (base: BaseConfig): Config => {
+    // * Destructure the network configuration from the base configuration.
+    const { networks, ...retries } = base
+
+    const config: Config = {
+        // * Set the default retry configuration for the network.
+        ...DEFAULT_NETWORK_RETRIES,
+        // * Overwrite the default retry configuration with the provided
+        //   values when they are not undefined.
+        ...retries,
+        /// * Set the default networks for the Engine.
+        networks: {},
+    }
 
     // * While we have a set of default networks, the configuration only
     //   contains the chains that the user has actually configured.
-    for (const networkId in networks) {
+    for (const networkId in base.networks) {
         const network: Network = {
             // * Append the default values to the network so that the user
             //   can operate with the default RPC and Etherscan URLs when
@@ -43,10 +44,10 @@ export const defineConfig = (
             ...DEFAULT_NETWORK_CONFIG,
             // * Finally set all the fields that the user provided in
             //   their configuration instantiation.
-            ...networks[networkId],
+            ...base.networks[networkId],
         }
 
-        config[networkId] = network
+        config.networks[networkId] = network
     }
 
     if (Object.keys(config).length === 0) {

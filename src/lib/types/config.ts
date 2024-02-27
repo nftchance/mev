@@ -8,6 +8,11 @@ export type Collectors = Array<Collector<any, any>>
 export type Executors = Array<Executor<any, any>>
 export type Strategies = Record<string, any>
 
+export type Retries = {
+    retries: number
+    delay: number
+}
+
 export type NetworkBase = {
     rpc: `wss://${string}` | `https://${string}`
     etherscan: string
@@ -28,4 +33,15 @@ export type NetworkConfig = {
 
 export type Network = NetworkBase & NetworkReferences & NetworkConfig
 
-export type Config = Record<keyof typeof DEFAULT_NETWORKS, Network>
+export type BaseConfig = Partial<Retries> &
+    (
+        | Record<
+              "networks",
+              Record<keyof typeof DEFAULT_NETWORKS, Partial<Network>>
+          >
+        | undefined
+    )
+
+export type Config = Retries & {
+    networks: Record<keyof typeof DEFAULT_NETWORKS, Network>
+}

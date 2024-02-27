@@ -1,3 +1,5 @@
+import EventEmitter from "node:events"
+
 import { Engine } from "@/core/engine/engine"
 import { configs } from "@/lib/functions/config"
 import { getStrategy } from "@/lib/functions/strategies"
@@ -14,8 +16,8 @@ export default async function (options: Props = {}) {
     let engines = []
 
     for (const config of await configs(options)) {
-        for (const networkIndex in config) {
-            const network = config[networkIndex]
+        for (const networkIndex in config.networks) {
+            const network = config.networks[networkIndex]
 
             // * Save a reference here because the user may be running a
             //   specific strategy and we don't want to run all of them.
@@ -32,7 +34,15 @@ export default async function (options: Props = {}) {
             if (Object.keys(network.strategies).length === 0) continue
 
             // * Run the Engine with a specific or all strategies.
-            engines.push(new Engine(network, strategies))
+            engines.push(
+                new Engine(
+                    network,
+                    strategies,
+                    new EventEmitter(),
+                    config.retries,
+                    config.delay
+                )
+            )
         }
     }
 
