@@ -4,13 +4,13 @@ import {
     FlashbotsTransactionResolution,
     RelayResponseError,
 } from "@flashbots/ethers-provider-bundle"
-import { providers, Wallet } from "ethers"
+import { TransactionRequest, Wallet, WebSocketProvider } from "ethers"
 
 import { Executor } from "@/core/executor"
 import { logger } from "@/lib/logger"
 
 export type FlashbotsExecution = {
-    transaction: providers.TransactionRequest
+    transaction: TransactionRequest
     config?: Partial<{
         // ! How many blocks in the future we will allow settlement within.
         buffer: number
@@ -26,8 +26,8 @@ export class FlashbotsExecutor<
     public flashbotsClient: FlashbotsBundleProvider | undefined
 
     constructor(
-        public readonly client: providers.WebSocketProvider,
-        public readonly signer: Wallet,
+        public readonly client: WebSocketProvider,
+        public readonly signer: Wallet
     ) {
         super(key)
     }
@@ -35,7 +35,7 @@ export class FlashbotsExecutor<
     init = async () => {
         this.flashbotsClient = await FlashbotsBundleProvider.create(
             this.client,
-            this.signer,
+            this.signer
         )
     }
 
@@ -57,13 +57,13 @@ export class FlashbotsExecutor<
                 privateTransaction,
                 {
                     maxBlockNumber,
-                },
+                }
             )
 
         if ((pendingTransaction as RelayResponseError).error) {
             pendingTransaction = pendingTransaction as RelayResponseError
             logger.error(
-                `[Flashbots] Flashbots relay error: ${pendingTransaction.error.message}`,
+                `[Flashbots] Flashbots relay error: ${pendingTransaction.error.message}`
             )
             return
         }
@@ -76,11 +76,11 @@ export class FlashbotsExecutor<
 
         if (response === FlashbotsTransactionResolution.TransactionIncluded) {
             logger.success(
-                `[Flashbots] Transaction included in block: ${pendingTransaction.transaction.hash}`,
+                `[Flashbots] Transaction included in block: ${pendingTransaction.transaction.hash}`
             )
         } else {
             logger.warn(
-                `[Flashbots] Transaction not included in block: ${pendingTransaction.transaction.hash}`,
+                `[Flashbots] Transaction not included in block: ${pendingTransaction.transaction.hash}`
             )
         }
     }

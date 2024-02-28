@@ -1,10 +1,9 @@
-// import { ContractTransaction, providers } from 'ethers'
-import { BigNumber, PopulatedTransaction, Wallet } from "ethers"
+import { TransactionRequest, Wallet } from "ethers"
 
 import { Executor } from "@/core/executor"
 
 export type MempoolExecution = {
-    transaction: PopulatedTransaction
+    transaction: TransactionRequest
     gasInfo?: {
         totalProfit: number
         bidPercentage?: number
@@ -23,6 +22,10 @@ export class MempoolExecutor<
     }
 
     execute = async ({ transaction, gasInfo }: TExecution) => {
+        if (!this.signer.provider) {
+            throw new Error("Signer does not have a provider.")
+        }
+
         // ! Estimate the gas consumption.
         const gasEstimate = await this.signer.provider.estimateGas(transaction)
 
@@ -39,11 +42,11 @@ export class MempoolExecutor<
             bidGasPrice = await this.signer.provider
                 .getFeeData()
                 .then((feeData) =>
-                    BigInt(feeData?.maxFeePerGas?.toString() || "0"),
+                    BigInt(feeData?.maxFeePerGas?.toString() || "0")
                 )
         }
 
-        transaction.gasPrice = BigNumber.from(bidGasPrice.toString())
+        transaction.gasPrice = BigInt(bidGasPrice.toString())
 
         // ! Send the transaction.
         await this.signer.sendTransaction(transaction)

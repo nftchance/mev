@@ -1,4 +1,4 @@
-import { providers, utils, Wallet } from "ethers"
+import { hexlify, isAddress, JsonRpcProvider, Wallet } from "ethers"
 import { AccessList } from "ethers/lib/utils"
 
 // ! Geth Implementation Reference used to architect this class:
@@ -19,7 +19,7 @@ export type State = Partial<{
     stateDiff: Record<`0x${string}`, any>
 }>
 
-export class StateOverride<T extends providers.JsonRpcProvider> {
+export class StateOverride<T extends JsonRpcProvider> {
     state: Record<
         `0x${string}`,
         // ! All numerical values should be hex encoded and not their raw values.
@@ -28,12 +28,12 @@ export class StateOverride<T extends providers.JsonRpcProvider> {
 
     constructor(
         public readonly client: T,
-        public readonly fast = false,
+        public readonly fast = false
     ) {}
 
     // * Add the state override to an adddress.
     addStateToAddress = (address: `0x${string}`, state: State) => {
-        const isValid = utils.isAddress(address)
+        const isValid = isAddress(address)
 
         if (!isValid) {
             throw new Error(`Invalid address: ${address}`)
@@ -58,20 +58,17 @@ export class StateOverride<T extends providers.JsonRpcProvider> {
 
     // ! If we do not provide the hex values that is okay because
     //   it will automatically be converted to the proper JSON-RPC format.
-    hex = (
-        transaction: Parameters<
-            typeof providers.JsonRpcProvider.hexlifyTransaction
-        >[0],
-    ) => {
+    hex = (transaction: Parameters<typeof hexlify>[0]) => {
         // * This will make all the values of the transaction safe as well as
         //   make sure the `accessList` is all setup.
-        return providers.JsonRpcProvider.hexlifyTransaction(transaction)
+        // TODO: Do not believe this is correct. Not sure yet.
+        return hexlify(transaction)
     }
 
     // * Simulate the transaction and return the access list and gas used.
     simulate = async (
         transaction: Parameters<typeof this.hex>[0],
-        block: number | "latest" | "pending",
+        block: number | "latest" | "pending"
     ): Promise<{
         accessList: AccessList
         gasUsed: `0x${string}`
@@ -85,7 +82,7 @@ export class StateOverride<T extends providers.JsonRpcProvider> {
     // * Submit an `eth_call` with the state override.
     call = async (
         transaction: Parameters<typeof this.hex>[0],
-        block: number | "latest" | "pending",
+        block: number | "latest" | "pending"
     ) => {
         return await this.client.send("eth_call", [
             this.hex(transaction),

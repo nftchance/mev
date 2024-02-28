@@ -1,4 +1,4 @@
-import { providers } from "ethers"
+import { WebSocketProvider } from "ethers"
 import { EventEmitter } from "node:events"
 
 import { Collector } from "@/core/collector"
@@ -11,7 +11,7 @@ export type BlockCollection = {
 }
 
 export class BlockCollector extends Collector<typeof key, BlockCollection> {
-    constructor(public readonly client: providers.WebSocketProvider) {
+    constructor(public readonly client: WebSocketProvider) {
         super(key)
     }
 
@@ -19,16 +19,21 @@ export class BlockCollector extends Collector<typeof key, BlockCollection> {
         this.client.on("block", async (blockNumber: number) => {
             try {
                 const block = await this.client.getBlock(blockNumber)
+                const hash = block?.hash
+                const number = block?.number
 
-                if (!block?.hash) {
+                const ready = hash && number
+
+                if (!ready) {
                     this.logger.warn(
-                        `[${this.key}]: Block [${blockNumber}] does not exist.`,
+                        `[${this.key}]: Block [${blockNumber}] does not exist.`
                     )
+                    return
                 }
 
                 this.emit(stream, {
-                    hash: block.hash,
-                    number: block.number,
+                    hash,
+                    number,
                 })
             } catch (err) {
                 this.logger.error(`[${this.key}] Failed retrieving block.`)
