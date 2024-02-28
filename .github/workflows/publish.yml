@@ -41,5 +41,5 @@ jobs:
                   commit: "feat: version release"
                   title: "feat: version release"
               env:
-                  npm_token: ${{ secrets.npm_token }}
+                  npm_token: ${{ secrets.NPM_TOKEN }}
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
