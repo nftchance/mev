@@ -1,5 +1,12 @@
 # @nftchance/mev
 
+## 0.0.13
+
+### Patch Changes
+
+-   8587c66: feat: strategy retries on error/crash
+-   54b69e8: feat: multichain support in a single process
+
 ## 0.0.1
 
 ### Patch Changes
