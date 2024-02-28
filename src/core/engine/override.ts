@@ -1,5 +1,4 @@
-import { hexlify, isAddress, JsonRpcProvider, Wallet } from "ethers"
-import { AccessList } from "ethers/lib/utils"
+import { AccessList, hexlify, isAddress, JsonRpcProvider, Wallet } from "ethers"
 
 // ! Geth Implementation Reference used to architect this class:
 //   https://geth.ethereum.org/docs/interacting-with-geth/rpc/ns-eth
