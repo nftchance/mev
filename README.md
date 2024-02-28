@@ -2,7 +2,7 @@
 
 A Typescript-based "process-parallel" MEV bot that has been evolved throughout the years. What this means, is that instead of creating new scripts and collectors for each of your strategies you can simply reuse the streams of data that already exist. Instead of needing a new `block` collector for every single strategy you run within the EVM ecosystem you can simply reuse a constant feed from one RPC endpoint. By doing this your RPC interactions remain far more managable and you are less limited by scale and throughput.
 
-![Installation image](/install.png)
+![Installation image](https://github.com/nftchance/mev/blob/main/install.png)
 
 Inspired by [Artemis](https://github.com/paradigmxyz/artemis), the key pieces of this engine can be broken down into:
 
@@ -41,41 +41,4 @@ With a passing test suite, you are cleared to enable the bot and let it run. Wit
 
 ```bash
 pnpm mev start
-```
-
-## Your Configuration
-
-As you create and utilize strategies your bot will be managed through a single configuration file. A copy-pasta ready starting point is as follows:
-
-```typescript
-import { BlockCollector, defineConfig } from "@nftchance/mev"
-import { providers, Wallet } from "ethers"
-import { z } from "zod"
-
-const envSchema = z.object({
-    ETHERSCAN_API_KEY: z.string(),
-    RPC_URL: z.string(),
-})
-
-const env = envSchema.parse(process.env)
-const client = new providers.WebSocketProvider(env.RPC_URL)
-const blockCollector = new BlockCollector(client)
-
-export default defineConfig({
-    references: {
-        artifacts: "./src/artifacts",
-        etherscan: (address: string) =>
-            `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apiKey=${env.ETHERSCAN_API_KEY}`,
-        bytecode: async (address: string) =>
-            await client.getCode(address, "latest"),
-        contracts: {
-            // ! Uniswap
-            UniswapV2Factory: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
-            UniswapV3Factory: "0x1F98431c8aD98523631AE4a59f267346ea31F984",
-        },
-    },
-    collectors: [blockCollector],
-    executors: [],
-    strategies: {},
-})
 ```
