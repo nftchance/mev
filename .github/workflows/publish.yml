@@ -1,4 +1,5 @@
 name: "📚 Publish"
+
 on:
     push:
         branches:
@@ -32,13 +33,21 @@ jobs:
             - name: 📦 Build package
               run: pnpm build
 
+            - name: 🎨 Creating .npmrc
+              run: |
+                  cat << EOF > "$HOME/.npmrc"
+                    //registry.npmjs.org/:_authToken=$NPM_TOKEN
+                  EOF
+              env:
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
             - name: 🚀 Create Release Pull Request or Publish
               id: changesets
               uses: changesets/action@v1
               with:
-                  publish: pnpm ci:publish
+                  publish: pnpm changeset publish
                   commit: "feat: version release"
                   title: "feat: version release"
               env:
-                  npm_token: ${{ secrets.npm_token }}
+                  npm_token: ${{ secrets.NPM_TOKEN }}
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

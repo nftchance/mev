@@ -11,10 +11,7 @@
     "bin": {
         "mev": "dist/cli/cli.js"
     },
-    "files": [
-        "src",
-        "dist"
-    ],
+    "files": ["src", "dist"],
     "publishConfig": {
         "access": "public"
     },
@@ -25,10 +22,7 @@
         "mev": "node dist/cli/cli.js",
         "prereferences": "npx build",
         "references": "node dist/lib/references.js",
-        "test": "jest --watchAll=false --detectOpenHandles",
-        "ci:release": "pnpm publish -r",
-        "ci:version": "changeset version",
-        "ci:publish": "changeset publish"
+        "test": "jest --watchAll=false --detectOpenHandles"
     },
     "devDependencies": {
         "@babel/preset-env": "^7.23.9",
