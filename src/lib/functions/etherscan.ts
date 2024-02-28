@@ -21,6 +21,11 @@ export const getSource = async (
 ): Promise<EtherscanResponse> => {
     let contract = { abi: undefined, name: undefined, source: undefined }
 
+    if (network.etherscanApiKey === undefined) {
+        logger.error(`Etherscan API key is not defined.`)
+        return contract
+    }
+
     const url = `${network.etherscan}?module=contract&action=getsourcecode&address=${address}&apiKey=${network.etherscanApiKey}`
 
     const response = await axios.get(url)
