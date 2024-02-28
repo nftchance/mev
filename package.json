@@ -2,7 +2,7 @@
     "name": "@nftchance/mev",
     "author": "nftchance",
     "license": "MIT",
-    "version": "0.0.12",
+    "version": "0.0.13",
     "description": "A MEV bot engine designed specifically for individuals that need high data stream throughput paired with the ability to craft new strategies in as few lines of code possible.",
     "type": "module",
     "main": "dist/index.js",
@@ -11,7 +11,10 @@
     "bin": {
         "mev": "dist/cli/cli.js"
     },
-    "files": ["src", "dist"],
+    "files": [
+        "src",
+        "dist"
+    ],
     "publishConfig": {
         "access": "public"
     },
