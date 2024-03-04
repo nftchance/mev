@@ -2,4 +2,4 @@
 "@nftchance/mev": patch
 ---
 
-fix: loose references but preventing generation
+fix: loose references bug preventing generation
