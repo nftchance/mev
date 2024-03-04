@@ -81,11 +81,7 @@ export const getSource = async (
 }
 
 export const getSources = async (network: Network) => {
-    if (
-        network.references === undefined ||
-        network.references.contracts === undefined
-    )
-        return []
+    if (network.references === undefined) return []
 
     return await Promise.all(
         Object.entries(network.references || []).map(
