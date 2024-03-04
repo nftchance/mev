@@ -1,5 +1,11 @@
 # @nftchance/mev
 
+## 0.0.15
+
+### Patch Changes
+
+-   d36df48: fix: loose references bug preventing generation
+
 ## 0.0.14
 
 ### Patch Changes
