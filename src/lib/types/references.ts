@@ -1,26 +1,38 @@
+import { Network } from "@/lib/types/config"
+
+export type ExplorerResponse = Name & {
+    network: Network
+} & Partial<{
+        abi: string
+        source: string
+    }>
+
+export type ArtifactResponse = {
+    network: Network
+} & Partial<{
+    address: string
+    bytecode: string
+    deployedBytecode: string
+}>
+
 export type Name = {
     name: string
 }
 
 export type StaticReference = Name & {
-    rpc: string
+    network: Network
     abi: string
-    address?: string
-    bytecode?: string
-    deployedBytecode?: string
-}
+} & Partial<{
+        address: string
+        bytecode: string
+        deployedBytecode: string
+    }>
 
 export type DynamicReference = Name & {
+    network: Network
     source: string
 }
 
 export type References = Array<
-    Name &
-        Partial<{
-            address: string
-            abi: string
-            bytecode: string
-            deployedBytecode: string
-            source: string
-        }>
+    Name & Omit<ExplorerResponse, "name"> & Partial<ArtifactResponse>
 >

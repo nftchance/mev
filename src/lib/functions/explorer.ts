@@ -1,17 +1,12 @@
-import { logger } from "../logger"
 import axios from "axios"
 
+import { logger } from "@/lib/logger"
 import { Network } from "@/lib/types/config"
+import { ExplorerResponse } from "@/lib/types/references"
 
 const escapeResults = ["Contract source code not verified"]
 const terminateResults = ["Invalid API Key"]
 const sleepResults = ["Rate limit"]
-
-type ExplorerResponse = {
-    abi?: string
-    name?: string
-    source?: string
-}
 
 export const getSource = async (
     network: Network,
@@ -19,7 +14,12 @@ export const getSource = async (
     address: `0x${string}`,
     remainingRetries = 3,
 ): Promise<ExplorerResponse> => {
-    let contract = { abi: undefined, name: undefined, source: undefined }
+    let contract = {
+        network,
+        name: "",
+        abi: undefined,
+        source: undefined,
+    }
 
     if (network.explorerHasApiKey && network.explorerApiKey === undefined) {
         logger.error(
@@ -83,10 +83,12 @@ export const getSource = async (
     const contractName = result.ContractName
     const source = result.SourceCode
 
-    return { abi, name: contractName, source }
+    return { network, abi, name: contractName, source }
 }
 
-export const getSources = async (network: Network) => {
+export const getSources = async (
+    network: Network,
+): Promise<Array<ExplorerResponse>> => {
     if (network.references === undefined) return []
 
     return await Promise.all(
@@ -94,7 +96,7 @@ export const getSources = async (network: Network) => {
             async ([name, address]) => {
                 const { abi, source } = await getSource(network, name, address)
 
-                return { name, address, abi, source }
+                return { network, name, address, abi, source }
             },
         ),
     )

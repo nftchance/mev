@@ -14,6 +14,7 @@ export type Retries = {
 }
 
 export type NetworkBase = {
+    key: string
     rpc: `wss://${string}` | `https://${string}`
     explorer: string
     explorerHasApiKey: boolean

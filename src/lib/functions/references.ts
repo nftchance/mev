@@ -14,14 +14,16 @@ import {
 } from "@/lib/types/references"
 
 const generateStaticReference = async (reference: StaticReference) => {
-    let { rpc, name, abi, address, bytecode, deployedBytecode } = reference
+    let { network, name, abi, address, bytecode, deployedBytecode } = reference
 
-    if (!fse.existsSync(`./src/references/${name}`))
-        fse.mkdirSync(`./src/references/${name}`, {
+    const referencePath = `./src/references/${network.key}/${name}`
+
+    if (!fse.existsSync(referencePath))
+        fse.mkdirSync(referencePath, {
             recursive: true,
         })
 
-    const file = `./src/references/${name}/index.ts`
+    const file = `${referencePath}/index.ts`
 
     if (fse.existsSync(file)) {
         logger.info(`Reference for ${name} already exists.`)
@@ -47,7 +49,7 @@ const generateStaticReference = async (reference: StaticReference) => {
     // ? This is not the creationCode (deployedBytecode) but the actual bytecode before
     //   constructor arguments were provided. Notably, deployedBytecode comes from
     if (address && bytecode === undefined)
-        bytecode = await getClient(rpc).getCode(address, "latest")
+        bytecode = await getClient(network.rpc).getCode(address, "latest")
 
     const imports = [address === undefined ? "utils" : "Contract"]
 
@@ -117,7 +119,7 @@ const generateStaticReference = async (reference: StaticReference) => {
 
     fse.writeFileSync(file, contractInterface)
 
-    logger.info(`Generated ./src/references/${name}/index.ts`)
+    logger.info(`Generated ${referencePath}/index.ts`)
 
     // TODO: Used to the Solidity files were generated here using the ABI however due to
     //       continued issues and lack of support for contracts that are on versions earlier
@@ -128,9 +130,11 @@ const generateStaticReference = async (reference: StaticReference) => {
 }
 
 const generateDynamicReference = (reference: DynamicReference) => {
-    let { name, source } = reference
+    let { network, name, source } = reference
 
-    if (fse.existsSync(`./src/references/${name}/contracts`)) {
+    const referencePath = `./src/references/${network.key}/${name}`
+
+    if (fse.existsSync(`${referencePath}/contracts`)) {
         logger.info(
             `Reference implementation contracts for ${name} already exist.`,
         )
@@ -162,7 +166,7 @@ const generateDynamicReference = (reference: DynamicReference) => {
         }
 
         Object.entries(contractSources).forEach(([sourceKey, value]) => {
-            const directory = `./src/references/${name}/${sourceKey
+            const directory = `${referencePath}/${sourceKey
                 .replace("./", "")
                 .split("/")
                 .slice(0, -1)
@@ -170,9 +174,7 @@ const generateDynamicReference = (reference: DynamicReference) => {
 
             const filename = sourceKey.replace("./", "").split("/").slice(-1)[0]
 
-            fse.mkdirSync(directory, {
-                recursive: true,
-            })
+            fse.mkdirSync(directory, { recursive: true })
 
             fse.writeFileSync(`${directory}/${filename}`, value.content)
 
@@ -186,10 +188,10 @@ const generateDynamicReference = (reference: DynamicReference) => {
 }
 
 export const generateReferences = async (network: Network) => {
-    let references: References = []
-    references = references
-        .concat(await getSources(network))
-        .concat(await getArtifacts(network))
+    const sources = await getSources(network)
+    const artifacts = await getArtifacts(network)
+
+    const references: References = [...sources, ...artifacts]
 
     // * Generate all of the reference files.
     await Promise.all(
@@ -202,10 +204,14 @@ export const generateReferences = async (network: Network) => {
                 deployedBytecode,
                 source,
             }) => {
+                // ! Avoid generating files for empty-name contracts as something went wrong
+                //   somewhere along the retrieval process.
+                if (name === "") return
+
                 // ! Generate the Typescript interface for the contract.
                 if (abi !== undefined)
                     await generateStaticReference({
-                        rpc: network.rpc,
+                        network,
                         name,
                         address,
                         abi,
@@ -217,7 +223,7 @@ export const generateReferences = async (network: Network) => {
                 // * If `.source` is undefined, then it is a local artifact and the Solidity
                 //   file was already created by the user.
                 if (source !== undefined)
-                    generateDynamicReference({ name, source })
+                    generateDynamicReference({ network, name, source })
             },
         ),
     )
