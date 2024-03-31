@@ -7,7 +7,7 @@ const escapeResults = ["Contract source code not verified"]
 const terminateResults = ["Invalid API Key"]
 const sleepResults = ["Rate limit"]
 
-type EtherscanResponse = {
+type ExplorerResponse = {
     abi?: string
     name?: string
     source?: string
@@ -17,28 +17,34 @@ export const getSource = async (
     network: Network,
     name: string,
     address: `0x${string}`,
-    remainingRetries = 3
-): Promise<EtherscanResponse> => {
+    remainingRetries = 3,
+): Promise<ExplorerResponse> => {
     let contract = { abi: undefined, name: undefined, source: undefined }
 
-    if (network.etherscanApiKey === undefined) {
-        logger.error(`Etherscan API key is not defined.`)
+    if (network.explorerHasApiKey && network.explorerApiKey === undefined) {
+        logger.error(
+            `Explorer API key is not defined, but is required for high throughput.`,
+        )
         return contract
     }
 
-    const url = `${network.etherscan}?module=contract&action=getsourcecode&address=${address}&apiKey=${network.etherscanApiKey}`
+    const url = `${
+        network.explorer
+    }?module=contract&action=getsourcecode&address=${address}${
+        network.explorerApiKey ? `&apikey=${network.explorerApiKey}` : ""
+    }`
 
     const response = await axios.get(url)
     const message = response.data.message
     let result = response.data.result
 
-    /// * Request submit to Etherscan was not successful.
+    /// * Request submit to the Explorer was not successful.
     if (message === "NOTOK") {
         const shouldRetry =
             terminateResults.every(
                 (termination) =>
                     result.toLowerCase().includes(termination.toLowerCase()) ===
-                    false
+                    false,
             ) && remainingRetries > 0
 
         logger.error(`Failed to get source for ${name}: ${result}.`)
@@ -50,7 +56,7 @@ export const getSource = async (
         /// * Before retrying, make sure we are not being rate limited. If so, sleep
         /// * for a bit before retrying.
         const shouldSleep = sleepResults.some((result) =>
-            result.toLowerCase().includes(result.toLowerCase())
+            result.toLowerCase().includes(result.toLowerCase()),
         )
 
         if (shouldSleep) {
@@ -63,7 +69,7 @@ export const getSource = async (
     /// * Request was successful, but the contract source code could not be retrieved.
     else if (
         escapeResults.some((result) =>
-            response.data.result[0].ABI.includes(result)
+            response.data.result[0].ABI.includes(result),
         )
     ) {
         logger.error(`Source code not verified for ${name}.`)
@@ -89,7 +95,7 @@ export const getSources = async (network: Network) => {
                 const { abi, source } = await getSource(network, name, address)
 
                 return { name, address, abi, source }
-            }
-        )
+            },
+        ),
     )
 }

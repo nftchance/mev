@@ -4,7 +4,7 @@ import { default as fse } from "fs-extra"
 
 import { getArtifacts } from "@/lib/functions/artifacts"
 import { getClient } from "@/lib/functions/client"
-import { getSources } from "@/lib/functions/etherscan"
+import { getSources } from "@/lib/functions/explorer"
 import { logger } from "@/lib/logger"
 import { Network } from "@/lib/types/config"
 import {
@@ -36,7 +36,7 @@ const generateStaticReference = async (reference: StaticReference) => {
                 ? letter
                 : letter === letter.toUpperCase()
                 ? `_${letter}`
-                : letter
+                : letter,
         )
         .join("")
         .toUpperCase()
@@ -104,13 +104,13 @@ const generateStaticReference = async (reference: StaticReference) => {
             .filter((x: any) => x.type === "event")
             .entries()) {
             eventTopics[event.name] = protocolInterface.getEventTopic(
-                event.name
+                event.name,
             )
         }
 
         contractInterface += dedent`\n
             export const ${bigName}_EVENT_TOPICS = ${JSON.stringify(
-                eventTopics
+                eventTopics,
             )} as const
         `
     }
@@ -123,7 +123,7 @@ const generateStaticReference = async (reference: StaticReference) => {
     //       continued issues and lack of support for contracts that are on versions earlier
     //       than 5.0 it results in a lot of issues. This will be revisted in the future.
     // NOTE: When you come back to this, probably easiest and best to directly retrieve
-    //       the source code from Etherscan and then generate the Solidity file from that.
+    //       the source code from Explorer and then generate the Solidity file from that.
     //       I am honestly not sure why I didn't just do that originally.
 }
 
@@ -132,7 +132,7 @@ const generateDynamicReference = (reference: DynamicReference) => {
 
     if (fse.existsSync(`./src/references/${name}/contracts`)) {
         logger.info(
-            `Reference implementation contracts for ${name} already exist.`
+            `Reference implementation contracts for ${name} already exist.`,
         )
         return
     }
@@ -180,7 +180,7 @@ const generateDynamicReference = (reference: DynamicReference) => {
         })
     } catch (error: any) {
         logger.error(
-            `Failed to parse the source code for ${name}: ${error.toString()}`
+            `Failed to parse the source code for ${name}: ${error.toString()}`,
         )
     }
 }
@@ -218,8 +218,8 @@ export const generateReferences = async (network: Network) => {
                 //   file was already created by the user.
                 if (source !== undefined)
                     generateDynamicReference({ name, source })
-            }
-        )
+            },
+        ),
     )
 
     logger.success(`References generated for ${references.length} contracts.`)
