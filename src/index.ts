@@ -1,10 +1,12 @@
 export { Abstract } from "@/core/abstract"
 export {
+    arbitrum,
+    base,
+    degen,
     mainnet,
     optimism,
     polygon,
-    base,
-    arbitrum,
+    zora,
 } from "@/core/engine/chains"
 export { defineConfig } from "@/core/engine/config"
 export { State, StateOverride } from "@/core/engine/override"
