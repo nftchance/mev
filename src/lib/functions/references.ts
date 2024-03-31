@@ -16,7 +16,7 @@ import {
 const generateStaticReference = async (reference: StaticReference) => {
     let { network, name, abi, address, bytecode, deployedBytecode } = reference
 
-    const referencePath = `./src/references/${network.key}/${name}`
+    const referencePath = `./src/references/${name}/${network.key}`
 
     if (!fse.existsSync(referencePath))
         fse.mkdirSync(referencePath, {
@@ -132,7 +132,7 @@ const generateStaticReference = async (reference: StaticReference) => {
 const generateDynamicReference = (reference: DynamicReference) => {
     let { network, name, source } = reference
 
-    const referencePath = `./src/references/${network.key}/${name}`
+    const referencePath = `./src/references/${name}/${network.key}`
 
     if (fse.existsSync(`${referencePath}/contracts`)) {
         logger.info(
