@@ -19,6 +19,7 @@ export const getSource = async (
         name: "",
         abi: undefined,
         source: undefined,
+        additionalSources: [],
     }
 
     if (network.explorerHasApiKey && network.explorerApiKey === undefined) {
@@ -79,11 +80,22 @@ export const getSource = async (
 
     /// * Request was successful, and the contract source code was retrieved.
     result = result[0]
-    const abi = result.ABI
-    const contractName = result.ContractName
-    const source = result.SourceCode
+    const abi: string = result.ABI
+    const contractName: string = result.ContractName
+    const source: string = result.SourceCode
 
-    return { network, abi, name: contractName, source }
+    /// * These are sources that are used as dependencies within the base contract.
+    const additionalSources = result.hasOwnProperty("AdditionalSources")
+        ? result.AdditionalSources
+        : []
+
+    return {
+        network,
+        abi,
+        name: contractName,
+        source,
+        additionalSources,
+    }
 }
 
 export const getSources = async (
@@ -94,9 +106,20 @@ export const getSources = async (
     return await Promise.all(
         Object.entries(network.references || []).map(
             async ([name, address]) => {
-                const { abi, source } = await getSource(network, name, address)
+                const { abi, source, additionalSources } = await getSource(
+                    network,
+                    name,
+                    address,
+                )
 
-                return { network, name, address, abi, source }
+                return {
+                    network,
+                    name,
+                    address,
+                    abi,
+                    source,
+                    additionalSources,
+                }
             },
         ),
     )

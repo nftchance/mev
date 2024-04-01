@@ -130,7 +130,7 @@ const generateStaticReference = async (reference: StaticReference) => {
 }
 
 const generateDynamicReference = (reference: DynamicReference) => {
-    let { network, name, source } = reference
+    let { network, name, source, additionalSources } = reference
 
     const referencePath = `./src/references/${name}/${network.key}`
 
@@ -153,6 +153,7 @@ const generateDynamicReference = (reference: DynamicReference) => {
 
         /// * This handles the case where the source code is a JSON object
         ///   because the contract was verified with a collection of resources.
+        // ? This will only ever base the case when using Etherscan.
         if (source.startsWith("{") && source.endsWith("}")) {
             contractSources = JSON.parse(source).sources
         }
@@ -164,6 +165,22 @@ const generateDynamicReference = (reference: DynamicReference) => {
                 [fileName]: { content: source },
             }
         }
+
+        /// * This handles when there are dependencies within the retrieved address
+        ///   from BlockScout as they've removed the nested parentheses and have added
+        ///   an additional field to the response.
+        /// ? This will break imports, but they would be broken even if not in the
+        ///   contracts/ directory because top-level imports are being used. Realistically
+        ///   contract references are used for understanding how to call things, not as
+        ///   actual builds unless you're integrating a custom project and in that case
+        ///   it is rather unlikely you need the full build.
+        additionalSources.forEach(({ Filename, SourceCode }) => {
+            const fileName = Filename.startsWith("/contracts")
+                ? Filename
+                : `contracts/${Filename}`
+
+            contractSources[fileName] = { content: SourceCode }
+        })
 
         Object.entries(contractSources).forEach(([sourceKey, value]) => {
             const directory = `${referencePath}/${sourceKey
@@ -203,6 +220,7 @@ export const generateReferences = async (network: Network) => {
                 bytecode,
                 deployedBytecode,
                 source,
+                additionalSources = [],
             }) => {
                 // ! Avoid generating files for empty-name contracts as something went wrong
                 //   somewhere along the retrieval process.
@@ -223,7 +241,12 @@ export const generateReferences = async (network: Network) => {
                 // * If `.source` is undefined, then it is a local artifact and the Solidity
                 //   file was already created by the user.
                 if (source !== undefined)
-                    generateDynamicReference({ network, name, source })
+                    generateDynamicReference({
+                        network,
+                        name,
+                        source,
+                        additionalSources,
+                    })
             },
         ),
     )
