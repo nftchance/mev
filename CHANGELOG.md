@@ -1,5 +1,12 @@
 # @nftchance/mev
 
+## 0.0.16
+
+### Patch Changes
+
+-   d394e41: feat: localize references into their own chain directory
+-   d394e41: feat: add support for blockscout and no api key needed
+
 ## 0.0.15
 
 ### Patch Changes
