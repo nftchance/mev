@@ -30,7 +30,7 @@ export const defineConfig = (base: BaseConfig): Config => {
     for (const networkId in networks) {
         const network: Network = {
             // * Append the default values to the network so that the user
-            //   can operate with the default RPC and Etherscan URLs when
+            //   can operate with the default RPC and Explorer URLs when
             //   they are not provided.
             ...DEFAULT_NETWORKS[networkId],
             // * Set the default values of the references for the network.

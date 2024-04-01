@@ -4,7 +4,7 @@ import { default as fse } from "fs-extra"
 
 import { getArtifacts } from "@/lib/functions/artifacts"
 import { getClient } from "@/lib/functions/client"
-import { getSources } from "@/lib/functions/etherscan"
+import { getSources } from "@/lib/functions/explorer"
 import { logger } from "@/lib/logger"
 import { Network } from "@/lib/types/config"
 import {
@@ -14,14 +14,16 @@ import {
 } from "@/lib/types/references"
 
 const generateStaticReference = async (reference: StaticReference) => {
-    let { rpc, name, abi, address, bytecode, deployedBytecode } = reference
+    let { network, name, abi, address, bytecode, deployedBytecode } = reference
 
-    if (!fse.existsSync(`./src/references/${name}`))
-        fse.mkdirSync(`./src/references/${name}`, {
+    const referencePath = `./src/references/${name}/${network.key}`
+
+    if (!fse.existsSync(referencePath))
+        fse.mkdirSync(referencePath, {
             recursive: true,
         })
 
-    const file = `./src/references/${name}/index.ts`
+    const file = `${referencePath}/index.ts`
 
     if (fse.existsSync(file)) {
         logger.info(`Reference for ${name} already exists.`)
@@ -36,7 +38,7 @@ const generateStaticReference = async (reference: StaticReference) => {
                 ? letter
                 : letter === letter.toUpperCase()
                 ? `_${letter}`
-                : letter
+                : letter,
         )
         .join("")
         .toUpperCase()
@@ -47,7 +49,7 @@ const generateStaticReference = async (reference: StaticReference) => {
     // ? This is not the creationCode (deployedBytecode) but the actual bytecode before
     //   constructor arguments were provided. Notably, deployedBytecode comes from
     if (address && bytecode === undefined)
-        bytecode = await getClient(rpc).getCode(address, "latest")
+        bytecode = await getClient(network.rpc).getCode(address, "latest")
 
     const imports = [address === undefined ? "utils" : "Contract"]
 
@@ -104,35 +106,37 @@ const generateStaticReference = async (reference: StaticReference) => {
             .filter((x: any) => x.type === "event")
             .entries()) {
             eventTopics[event.name] = protocolInterface.getEventTopic(
-                event.name
+                event.name,
             )
         }
 
         contractInterface += dedent`\n
             export const ${bigName}_EVENT_TOPICS = ${JSON.stringify(
-                eventTopics
+                eventTopics,
             )} as const
         `
     }
 
     fse.writeFileSync(file, contractInterface)
 
-    logger.info(`Generated ./src/references/${name}/index.ts`)
+    logger.info(`Generated ${referencePath}/index.ts`)
 
     // TODO: Used to the Solidity files were generated here using the ABI however due to
     //       continued issues and lack of support for contracts that are on versions earlier
     //       than 5.0 it results in a lot of issues. This will be revisted in the future.
     // NOTE: When you come back to this, probably easiest and best to directly retrieve
-    //       the source code from Etherscan and then generate the Solidity file from that.
+    //       the source code from Explorer and then generate the Solidity file from that.
     //       I am honestly not sure why I didn't just do that originally.
 }
 
 const generateDynamicReference = (reference: DynamicReference) => {
-    let { name, source } = reference
+    let { network, name, source, additionalSources } = reference
 
-    if (fse.existsSync(`./src/references/${name}/contracts`)) {
+    const referencePath = `./src/references/${name}/${network.key}`
+
+    if (fse.existsSync(`${referencePath}/contracts`)) {
         logger.info(
-            `Reference implementation contracts for ${name} already exist.`
+            `Reference implementation contracts for ${name} already exist.`,
         )
         return
     }
@@ -149,6 +153,7 @@ const generateDynamicReference = (reference: DynamicReference) => {
 
         /// * This handles the case where the source code is a JSON object
         ///   because the contract was verified with a collection of resources.
+        // ? This will only ever base the case when using Etherscan.
         if (source.startsWith("{") && source.endsWith("}")) {
             contractSources = JSON.parse(source).sources
         }
@@ -161,8 +166,24 @@ const generateDynamicReference = (reference: DynamicReference) => {
             }
         }
 
+        /// * This handles when there are dependencies within the retrieved address
+        ///   from BlockScout as they've removed the nested parentheses and have added
+        ///   an additional field to the response.
+        /// ? This will break imports, but they would be broken even if not in the
+        ///   contracts/ directory because top-level imports are being used. Realistically
+        ///   contract references are used for understanding how to call things, not as
+        ///   actual builds unless you're integrating a custom project and in that case
+        ///   it is rather unlikely you need the full build.
+        additionalSources.forEach(({ Filename, SourceCode }) => {
+            const fileName = Filename.startsWith("/contracts")
+                ? Filename
+                : `contracts/${Filename}`
+
+            contractSources[fileName] = { content: SourceCode }
+        })
+
         Object.entries(contractSources).forEach(([sourceKey, value]) => {
-            const directory = `./src/references/${name}/${sourceKey
+            const directory = `${referencePath}/${sourceKey
                 .replace("./", "")
                 .split("/")
                 .slice(0, -1)
@@ -170,9 +191,7 @@ const generateDynamicReference = (reference: DynamicReference) => {
 
             const filename = sourceKey.replace("./", "").split("/").slice(-1)[0]
 
-            fse.mkdirSync(directory, {
-                recursive: true,
-            })
+            fse.mkdirSync(directory, { recursive: true })
 
             fse.writeFileSync(`${directory}/${filename}`, value.content)
 
@@ -180,16 +199,16 @@ const generateDynamicReference = (reference: DynamicReference) => {
         })
     } catch (error: any) {
         logger.error(
-            `Failed to parse the source code for ${name}: ${error.toString()}`
+            `Failed to parse the source code for ${name}: ${error.toString()}`,
         )
     }
 }
 
 export const generateReferences = async (network: Network) => {
-    let references: References = []
-    references = references
-        .concat(await getSources(network))
-        .concat(await getArtifacts(network))
+    const sources = await getSources(network)
+    const artifacts = await getArtifacts(network)
+
+    const references: References = [...sources, ...artifacts]
 
     // * Generate all of the reference files.
     await Promise.all(
@@ -201,11 +220,16 @@ export const generateReferences = async (network: Network) => {
                 bytecode,
                 deployedBytecode,
                 source,
+                additionalSources = [],
             }) => {
+                // ! Avoid generating files for empty-name contracts as something went wrong
+                //   somewhere along the retrieval process.
+                if (name === "") return
+
                 // ! Generate the Typescript interface for the contract.
                 if (abi !== undefined)
                     await generateStaticReference({
-                        rpc: network.rpc,
+                        network,
                         name,
                         address,
                         abi,
@@ -217,9 +241,14 @@ export const generateReferences = async (network: Network) => {
                 // * If `.source` is undefined, then it is a local artifact and the Solidity
                 //   file was already created by the user.
                 if (source !== undefined)
-                    generateDynamicReference({ name, source })
-            }
-        )
+                    generateDynamicReference({
+                        network,
+                        name,
+                        source,
+                        additionalSources,
+                    })
+            },
+        ),
     )
 
     logger.success(`References generated for ${references.length} contracts.`)

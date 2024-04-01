@@ -56,6 +56,7 @@ export async function getArtifacts(network: Network) {
 
                 return {
                     key: name.replace(".sol", ""),
+                    network,
                     name,
                     abi: JSON.stringify(abi),
                     bytecode,

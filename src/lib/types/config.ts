@@ -14,12 +14,14 @@ export type Retries = {
 }
 
 export type NetworkBase = {
+    key: string
     rpc: `wss://${string}` | `https://${string}`
-    etherscan: string
+    explorer: string
+    explorerHasApiKey: boolean
 }
 
 export type NetworkReferences = Partial<{
-    etherscanApiKey: string
+    explorerApiKey: string
 }> & {
     artifacts: string
     references: References
